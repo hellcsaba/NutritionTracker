@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "427888083222",
+    "project_id": "nutritiontrackerfirebaseauth",
+    "storage_bucket": "nutritiontrackerfirebaseauth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427888083222:android:303e2316f4d680c56ad037",
+        "android_client_info": {
+          "package_name": "hu.bme.aut.nutritiontracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "427888083222-3sm64mlqm16k6t9gn4us5o8lg5ou1cep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiNzuTKSOXFK_jsRHDUd4HMlFG_PZOYRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "427888083222-3sm64mlqm16k6t9gn4us5o8lg5ou1cep.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
