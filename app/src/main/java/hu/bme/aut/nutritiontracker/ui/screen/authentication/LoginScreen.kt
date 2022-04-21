@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.nutritiontracker.model.FirebaseAuthRepository
+import hu.bme.aut.nutritiontracker.ui.navigation.BottomBarScreen
 
 @Composable
 fun LoginScreen( navController: NavController,
@@ -69,8 +70,14 @@ fun LoginScreen( navController: NavController,
 
         Button(
             onClick = {
-                if(FirebaseAuthRepository.signIn(email, password))
-                    navController.navigate(route = Screen.Home.route)
+                if(FirebaseAuthRepository.signIn(email, password)){
+                    navController.navigate(Screen.MainScreen.route) {
+
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }
+                    //navController.navigate(route = BottomBarScreen.Diary.route)
                 //sendEmailVerification()
                 Log.d("LoginScreen", "SignIn button clicked")
             }, colors = ButtonDefaults.textButtonColors(

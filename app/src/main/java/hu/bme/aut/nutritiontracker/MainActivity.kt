@@ -17,21 +17,13 @@ import hu.bme.aut.nutritiontracker.ui.MainScreen
 import hu.bme.aut.nutritiontracker.ui.theme.NutritionTrackerTheme
 
 class MainActivity : ComponentActivity() {
-
-    lateinit var navController: NavHostController
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NutritionTrackerTheme {
-                MainScreen()
-                //navController = rememberNavController()
-                //SetupNavGraph(navController = navController)
+                SetupNavGraph()
             }
         }
     }
-
-
-
 }
 

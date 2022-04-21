@@ -1,44 +1,40 @@
 package hu.bme.aut.nutritiontracker.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
+import hu.bme.aut.nutritiontracker.R
 
 sealed class BottomBarScreen(
     val route: String,
     val title: String,
-    val icon: ImageVector
+    val icon: Int
 ) {
     object Diary : BottomBarScreen(
         route = "diary",
         title = "Diary",
-        icon = Icons.Default.Home
+        icon = R.drawable.ic_outline_book_24
     )
 
     object Size : BottomBarScreen(
         route = "size",
         title = "Size",
-        icon = Icons.Default.Person
+        icon = R.drawable.ic_bottomnav_measure
     )
 
     object Plan : BottomBarScreen(
         route = "plan",
         title = "Plan",
-        icon = Icons.Default.Person
+        icon = R.drawable.ic_bottomnav_plan
     )
 
 
     object Recipe : BottomBarScreen(
         route = "recipes",
         title = "Recipes",
-        icon = Icons.Default.Settings
+        icon = R.drawable.ic_bottomnav_recipe
     )
 
     object Profile : BottomBarScreen(
         route = "profile",
         title = "Profile",
-        icon = Icons.Default.Person
+        icon = R.drawable.ic_outline_person_outline_24
     )
 }
