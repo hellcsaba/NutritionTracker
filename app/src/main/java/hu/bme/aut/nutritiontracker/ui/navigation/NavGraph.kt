@@ -1,31 +1,40 @@
 package hu.bme.aut.nutritiontracker
 
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import hu.bme.aut.nutritiontracker.ui.screen.HomeScreen
+import androidx.navigation.compose.rememberNavController
+import hu.bme.aut.nutritiontracker.ui.MainScreen
+import hu.bme.aut.nutritiontracker.ui.navigation.BottomBarScreen
+import hu.bme.aut.nutritiontracker.ui.screen.*
+
 
 @Composable
-fun SetupNavGraph(navController: NavHostController){
+fun SetupNavGraph() {
+    val navController = rememberNavController()
+    val navBarNavController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route
-    ){
+    ) {
         composable(
             route = Screen.Login.route
-        ){
+        ) {
             LoginScreen(navController = navController)
         }
         composable(
             route = Screen.SignUp.route
-        ){
+        ) {
             SignUpScreen(navController = navController)
         }
         composable(
-            route = Screen.Home.route
-        ){
-            HomeScreen(navController = navController)
+            route = Screen.MainScreen.route
+        ) {
+            MainScreen(navController = navBarNavController)
         }
     }
 }
+
+

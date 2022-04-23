@@ -4,21 +4,22 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomBarScreen
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomNavGraph
 
 @Composable
-fun MainScreen() {
-    val navController = rememberNavController()
+fun MainScreen(navController: NavHostController) {
+    val scaffoldState = rememberScaffoldState()
     Scaffold(
-        bottomBar = { BottomBar(navController = navController) }
-    ) {
+        bottomBar = { BottomBar(navController = navController) },
+        scaffoldState = scaffoldState,
+        ) {
         BottomNavGraph(navController = navController)
     }
 }
@@ -58,7 +59,7 @@ fun RowScope.AddItem(
         },
         icon = {
             Icon(
-                imageVector = screen.icon,
+                painter = painterResource(id = screen.icon),
                 contentDescription = "Navigation Icon"
             )
         },

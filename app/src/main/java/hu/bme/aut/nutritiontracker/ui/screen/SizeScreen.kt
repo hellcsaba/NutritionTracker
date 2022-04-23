@@ -17,7 +17,7 @@ fun SizeScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Magenta),
+            .background(Color.LightGray),
         contentAlignment = Alignment.Center
     ) {
         Text(
