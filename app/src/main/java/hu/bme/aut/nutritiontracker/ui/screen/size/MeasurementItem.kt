@@ -59,7 +59,7 @@ fun MeasurementItem(measurement: Measurement) {
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = measurement.size.toString(),
+                text = measurement.previousSize.toString(),
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -104,8 +104,8 @@ fun MeasurementItemPreview() {
     MeasurementItem(
         measurement = Measurement(
             name = "Weight",
-            size = 70.0,
-            date = Calendar.getInstance()
+            previousSize = 70.0,
+            currentSize = 0.0
         )
     )
 }

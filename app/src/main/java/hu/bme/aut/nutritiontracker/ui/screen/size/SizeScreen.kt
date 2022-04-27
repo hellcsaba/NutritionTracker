@@ -46,7 +46,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
             AddMeasurementDialog(
                 onConfirmClicked = {
                     showToast(context = context, "onConfirmClicked")
-                    sizeViewModel.getAllData.add(Measurement(name,0.0,Calendar.getInstance()))
+                    sizeViewModel.getAllData?.add(Measurement(name,null,null))
                     name = ""
                     openDialog = false
                 },
@@ -105,8 +105,10 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                 }
             }
 
-            items(items = sizeViewModel.getAllData){
-                    measurement -> MeasurementItem(measurement = measurement)
+            if(!sizeViewModel.getAllData.isNullOrEmpty()){
+                items(items = sizeViewModel.getAllData) { measurement ->
+                    MeasurementItem(measurement = measurement)
+                }
             }
         }
 
