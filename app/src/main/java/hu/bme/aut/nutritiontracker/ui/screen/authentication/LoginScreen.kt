@@ -133,7 +133,8 @@ fun LoginScreen(authenticationViewModel: AuthenticationViewModel = Authenticatio
         Button(
             modifier = Modifier.fillMaxWidth(0.5f),
             onClick = {
-                if (authenticationViewModel.signIn(email, password)) {
+                if(true){
+                //if (authenticationViewModel.signIn(email, password)) {
                     navController.navigate(Screen.MainScreen.route) {
                         popUpTo(navController.graph.startDestinationId)
                         launchSingleTop = true

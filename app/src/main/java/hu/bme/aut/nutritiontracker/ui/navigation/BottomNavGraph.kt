@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import hu.bme.aut.nutritiontracker.ui.screen.*
+import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 
 
 @Composable
@@ -22,7 +23,7 @@ fun BottomNavGraph(navController: NavHostController) {
             ProfileScreen()
         }
         composable(route = BottomBarScreen.Size.route) {
-            SizeScreen()
+            SizeScreen(sizeViewModel = SizeViewModel())
         }
         composable(route = BottomBarScreen.Plan.route) {
             PlanScreen()
