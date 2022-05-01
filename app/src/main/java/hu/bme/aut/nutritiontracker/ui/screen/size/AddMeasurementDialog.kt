@@ -21,7 +21,6 @@ fun AddMeasurementDialog(
     name: String,
     onNameChanged: (String) -> Unit
 ) {
-    //var name by remember { mutableStateOf("") }
     Dialog(
         onDismissRequest = onDismiss,
     ) {

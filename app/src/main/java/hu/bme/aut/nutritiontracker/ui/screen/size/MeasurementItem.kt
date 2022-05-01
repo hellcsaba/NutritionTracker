@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,67 +29,71 @@ import java.util.*
 @Composable
 fun MeasurementItem(measurement: Measurement) {
     var size by remember {mutableStateOf("")}
-    Row(
-        modifier = Modifier
-            .background(Color.LightGray)
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
-            .height(40.dp)
-            .clip(RoundedCornerShape(6.dp)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    Card(
+        shape = RoundedCornerShape(6.dp)
     ) {
+        Row(
+            modifier = Modifier
+                .background(Color.LightGray)
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                .height(40.dp)
+                .clip(RoundedCornerShape(6.dp)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
 
-        Box(
-            modifier = Modifier.weight(5.0f)
-        ) {
-            Text(
-                text = measurement.name,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Box(
-            modifier = Modifier
-                .width(50.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .align(Alignment.CenterVertically)
-        ) {
-            Text(
-                text = measurement.previousSize.toString(),
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .width(50.dp)
-                    .height(40.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(color = Color.Gray)
-                    .align(Alignment.Center)
-                    .padding(start = 10.dp, bottom = 5.dp, top = 5.dp, end = 5.dp),
-                maxLines = 1
-            )
-        }
-        Box(
-            modifier = Modifier
-                .width(50.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(color = Color.White)
-        ) {
-            BasicTextField(
-                value = size,
-                onValueChange = { size = it },
-                modifier = Modifier
-                    .width(50.dp)
-                    .height(40.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .align(Alignment.Center)
-                    .padding(5.dp),
-                textStyle = TextStyle(fontSize = 20.sp),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
+            Box(
+                modifier = Modifier.weight(5.0f)
+            ) {
+                Text(
+                    text = measurement.name,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
                 )
-            )
+            }
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = measurement.previousSize.toString(),
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .width(50.dp)
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(color = Color.Gray)
+                        .align(Alignment.Center)
+                        .padding(start = 10.dp, bottom = 5.dp, top = 5.dp, end = 5.dp),
+                    maxLines = 1
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(color = Color.White)
+            ) {
+                BasicTextField(
+                    value = size,
+                    onValueChange = { size = it },
+                    modifier = Modifier
+                        .width(50.dp)
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .align(Alignment.Center)
+                        .padding(5.dp),
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    )
+                )
+            }
         }
     }
 }

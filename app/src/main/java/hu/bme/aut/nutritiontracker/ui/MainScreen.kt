@@ -1,9 +1,12 @@
 package hu.bme.aut.nutritiontracker.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -19,8 +22,10 @@ fun MainScreen(navController: NavHostController) {
     Scaffold(
         bottomBar = { BottomBar(navController = navController) },
         scaffoldState = scaffoldState,
-        ) {
-        BottomNavGraph(navController = navController)
+        ) {innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            BottomNavGraph(navController = navController)
+        }
     }
 }
 

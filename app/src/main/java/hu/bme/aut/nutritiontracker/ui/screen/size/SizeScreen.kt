@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,7 +41,6 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
             },
             onSaveClicked = {}
         )},
-        bottomBar = {}
     ){
         if(openDialog){
             AddMeasurementDialog(
@@ -61,57 +61,59 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
         LazyColumn(
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
-        ){
+        ) {
             stickyHeader {
-                Row(
-                    modifier = Modifier
-                        .background(Color.LightGray)
-                        .fillMaxWidth()
-                        .padding(6.dp)
-                        .height(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                Card(
+                    shape = RoundedCornerShape(6.dp)
                 ) {
-
-                    Box(
-                        modifier = Modifier.weight(5.0f)
+                    Row(
+                        modifier = Modifier
+                            .background(Color.LightGray)
+                            .fillMaxWidth()
+                            .padding(6.dp)
+                            .height(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = "Name",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Box(
-                        modifier = Modifier.width(50.dp)
-                    ) {
-                        Text(
-                            text = "Prev.",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                    Box(
-                        modifier = Modifier.width(50.dp)
-                    ) {
-                        Text(
-                            text = "Curr.",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+
+                        Box(
+                            modifier = Modifier.weight(5.0f)
+                        ) {
+                            Text(
+                                text = "Name",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Box(
+                            modifier = Modifier.width(50.dp)
+                        ) {
+                            Text(
+                                text = "Prev.",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                        Box(
+                            modifier = Modifier.width(50.dp)
+                        ) {
+                            Text(
+                                text = "Curr.",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
 
 
+                    }
                 }
             }
-
-            if(!sizeViewModel.getAllData.isNullOrEmpty()){
-                items(items = sizeViewModel.getAllData) { measurement ->
-                    MeasurementItem(measurement = measurement)
+                if (!sizeViewModel.getAllData.isNullOrEmpty()) {
+                    items(items = sizeViewModel.getAllData) { measurement ->
+                        MeasurementItem(measurement = measurement)
+                    }
                 }
-            }
         }
-
     }
 }
 
