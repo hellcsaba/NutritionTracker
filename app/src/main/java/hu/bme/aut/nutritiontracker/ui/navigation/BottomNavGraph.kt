@@ -1,12 +1,16 @@
 package hu.bme.aut.nutritiontracker.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import hu.bme.aut.nutritiontracker.MainActivity
 import hu.bme.aut.nutritiontracker.ui.screen.*
+import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 
 
@@ -29,7 +33,9 @@ fun BottomNavGraph(navController: NavHostController) {
             PlanScreen()
         }
         composable(route = BottomBarScreen.Recipe.route) {
-            RecipeScreen()
+            val recipeViewModel = RecipeViewModel()
+            recipeViewModel.attach((LocalContext.current as LifecycleOwner))
+            RecipeScreen(recipeViewModel = recipeViewModel)
         }
     }
 }
