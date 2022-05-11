@@ -2,30 +2,52 @@ package hu.bme.aut.nutritiontracker.datasource
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import hu.bme.aut.nutritiontracker.BuildConfig
-import hu.bme.aut.nutritiontracker.data.RecipeResult
+import hu.bme.aut.nutritiontracker.data.RecipeDetailResult
+import hu.bme.aut.nutritiontracker.data.RecipeListResult
 import hu.bme.aut.nutritiontracker.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+const val RECIPE_APIKEY = "1cc3f4b2574241cf961033b15b12f621"
+
 object RecipeNetworkDataSource {
-    fun getRecipes(name: String?): MutableLiveData<RecipeResult>{
-        val call = RetrofitClient.apiInterface.getFood("1cc3f4b2574241cf961033b15b12f621", name)
+    fun getRecipesList(name: String?): MutableLiveData<RecipeListResult>{
+        val call = RetrofitClient.apiInterface.getRecipesList(RECIPE_APIKEY, name)
 
-        val recipeResultData = MutableLiveData<RecipeResult>()
+        val RecipeListResultData = MutableLiveData<RecipeListResult>()
 
-        call.enqueue(object: Callback<RecipeResult>{
-            override fun onResponse(call: Call<RecipeResult>, response: Response<RecipeResult>){
+        call.enqueue(object: Callback<RecipeListResult>{
+            override fun onResponse(call: Call<RecipeListResult>, response: Response<RecipeListResult>){
                 Log.d("DEBUG onResponse", response.body().toString())
-                recipeResultData.value = response.body()
+                RecipeListResultData.value = response.body()
             }
 
-            override fun onFailure(call: Call<RecipeResult>, t: Throwable) {
+            override fun onFailure(call: Call<RecipeListResult>, t: Throwable) {
                 Log.d("DEBUG onFailure", t.message.toString())
             }
         })
 
-        return recipeResultData
+        return RecipeListResultData
+    }
+
+    fun getRecipeDetail(id: Int): MutableLiveData<RecipeDetailResult>{
+        val call = RetrofitClient.apiInterface.getRecipe(id ,RECIPE_APIKEY)
+
+        val RecipeDetailResultData = MutableLiveData<RecipeDetailResult>()
+
+        call.enqueue(object: Callback<RecipeDetailResult>{
+            override fun onResponse(call: Call<RecipeDetailResult>, response: Response<RecipeDetailResult>){
+                Log.d("DEBUG onResponse", response.body().toString())
+                RecipeDetailResultData.value = response.body()
+            }
+
+            override fun onFailure(call: Call<RecipeDetailResult>, t: Throwable) {
+                Log.d("DEBUG onFailure", t.message.toString())
+            }
+
+        })
+
+        return RecipeDetailResultData
     }
 }

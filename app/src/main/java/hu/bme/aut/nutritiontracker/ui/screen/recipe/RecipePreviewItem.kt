@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,13 +19,15 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import hu.bme.aut.nutritiontracker.data.Recipe
 
+@OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
 @Composable
-fun RecipePreviewItem(recipe: Recipe){
+fun RecipePreviewItem(recipe: Recipe, onClick: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(6.dp),
         elevation = 8.dp,
+        onClick = onClick
     ){
         Column()
         {

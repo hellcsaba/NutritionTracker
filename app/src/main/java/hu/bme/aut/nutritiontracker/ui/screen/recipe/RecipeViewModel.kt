@@ -6,29 +6,47 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.*
 import hu.bme.aut.nutritiontracker.data.Recipe
-import hu.bme.aut.nutritiontracker.data.RecipeResult
+import hu.bme.aut.nutritiontracker.data.RecipeDetailResult
+import hu.bme.aut.nutritiontracker.data.RecipeListResult
 import hu.bme.aut.nutritiontracker.datasource.RecipeNetworkDataSource
 import hu.bme.aut.nutritiontracker.model.RecipeRepository
 
 class RecipeViewModel: ViewModel() {
     private var recipeRepository = RecipeRepository()
-    lateinit var recipesList: MutableLiveData<RecipeResult>
-
-    fun getRecipes(name: String?): LiveData<RecipeResult>{
-        recipesList = recipeRepository.getRecipes(name)
-        return recipesList
-    }
+    lateinit var recipesList: MutableLiveData<RecipeListResult>
+    var recipeDetail: MutableLiveData<RecipeDetailResult> = MutableLiveData()
 
     private lateinit var owner: LifecycleOwner
     fun attach(lifeCycleOwner: LifecycleOwner){
         owner = lifeCycleOwner
     }
 
+    fun getRecipes(name: String?): LiveData<RecipeListResult>{
+        recipesList = recipeRepository.getRecipesList(name)
+        return recipesList
+    }
+
     fun getRecipesList(name: String?){
-        recipeRepository.getRecipes(name).observe(owner,
-            object: Observer<RecipeResult> {
-                override fun onChanged(res: RecipeResult?) {
+        recipeRepository.getRecipesList(name).observe(owner,
+            object: Observer<RecipeListResult> {
+                override fun onChanged(res: RecipeListResult?) {
                     recipesList.postValue(res)
+                }
+
+            }
+        )
+    }
+
+    fun getRecipe(id: Int): LiveData<RecipeDetailResult>{
+        recipeDetail = recipeRepository.getRecipeDetail(id)
+        return recipeDetail
+    }
+
+    fun getRecipeDetail(id: Int){
+        recipeRepository.getRecipeDetail(id).observe(owner,
+            object: Observer<RecipeDetailResult> {
+                override fun onChanged(res: RecipeDetailResult?) {
+                    recipeDetail.postValue(res)
                 }
 
             }

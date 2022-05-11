@@ -23,17 +23,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import hu.bme.aut.nutritiontracker.Screen
 import hu.bme.aut.nutritiontracker.data.Recipe
-import hu.bme.aut.nutritiontracker.data.RecipeResult
+import hu.bme.aut.nutritiontracker.data.RecipeListResult
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipePreviewItem
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.SearchWidgetState
 
 @Composable
-fun RecipeScreen(recipeViewModel: RecipeViewModel) {
+fun RecipeScreen(recipeViewModel: RecipeViewModel, navController: NavController) {
     val searchWidgetState by recipeViewModel.searchWidgetState
     val searchTextState by recipeViewModel.searchTextState
-    val recipes: RecipeResult? by recipeViewModel.getRecipes("").observeAsState()
+    val recipes: RecipeListResult? by recipeViewModel.getRecipes("").observeAsState()
 
     Scaffold(
         topBar = {
@@ -48,8 +51,6 @@ fun RecipeScreen(recipeViewModel: RecipeViewModel) {
                 },
                 onSearchClicked = {
                     recipeViewModel.getRecipesList(it)
-                    Log.d("onSearch", it)
-                    Log.d("onSearchRecipeList", recipes?.results?.size.toString())
                 },
                 onSearchTriggered = {
                     recipeViewModel.updateSearchWidgetState(newValue = SearchWidgetState.OPENED)
@@ -63,8 +64,12 @@ fun RecipeScreen(recipeViewModel: RecipeViewModel) {
         ) {
             recipes?.let { list->
                 items(items = list.results!!) { recipe ->
-                    Log.d("LazyColumn", "items list is not null")
-                    RecipePreviewItem(recipe = recipe)
+                    RecipePreviewItem(recipe = recipe,
+                        onClick = {
+                            recipeViewModel.getRecipeDetail(recipe.id!!)
+                            navController.navigate(route = "recipe_detail_screen/"+recipe.id)
+                        }
+                    )
                 }
             }
 
@@ -203,5 +208,5 @@ fun SearchAppBar(
 @Composable
 @Preview
 fun RecipeScreenPreview() {
-    RecipeScreen(RecipeViewModel())
+    RecipeScreen(RecipeViewModel(), navController = rememberNavController())
 }
