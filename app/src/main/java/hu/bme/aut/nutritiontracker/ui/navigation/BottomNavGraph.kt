@@ -1,17 +1,27 @@
 package hu.bme.aut.nutritiontracker.ui.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import hu.bme.aut.nutritiontracker.MainActivity
+import hu.bme.aut.nutritiontracker.Screen
 import hu.bme.aut.nutritiontracker.ui.screen.*
+import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeDetailScreen
+import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 
 
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
+    val recipeViewModel = RecipeViewModel()
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Diary.route
@@ -29,7 +39,16 @@ fun BottomNavGraph(navController: NavHostController) {
             PlanScreen()
         }
         composable(route = BottomBarScreen.Recipe.route) {
-            RecipeScreen()
+            recipeViewModel.attach((LocalContext.current as LifecycleOwner))
+            RecipeScreen(recipeViewModel = recipeViewModel, navController)
+        }
+        composable(
+            route = Screen.RecipeDetailScreen.route,
+            arguments = listOf(navArgument("id"){
+                type = NavType.IntType
+            })
+        ){
+            RecipeDetailScreen(recipeViewModel = recipeViewModel)
         }
     }
 }
