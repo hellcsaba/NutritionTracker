@@ -62,6 +62,7 @@ fun Content(recipe: RecipeDetailResult){
             contentDescription = "Recipe Image",
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(12.dp)
                 .clip(Shapes.medium),
             contentScale = ContentScale.Crop,
         )
@@ -104,9 +105,9 @@ fun BasicInfo(recipe: RecipeDetailResult) {
             .fillMaxWidth()
             .padding(top = 16.dp)
     ) {
-        InfoColumn(R.drawable.ic_baseline_clock_24, (recipe.readyInMinutes ?: "??").toString() +"min")
-        InfoColumn(R.drawable.ic_outline_star_outline_24, (recipe.spoonacularScore ?: "??").toString())
-        InfoColumn(R.drawable.ic_baseline_serving_24, (recipe.servings ?: "??").toString())
+        InfoColumn(R.drawable.ic_baseline_clock_24, (recipe.readyInMinutes ?: "?").toString() +"min")
+        InfoColumn(R.drawable.ic_outline_star_outline_24, (recipe.spoonacularScore ?: "?").toString())
+        InfoColumn(R.drawable.ic_baseline_serving_24, (recipe.servings ?: "?").toString())
     }
 }
 
