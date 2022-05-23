@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -37,8 +38,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     var openDialog by rememberSaveable { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     val measurements = sizeViewModel.allMeasurements.observeAsState()
-    var size: String = ""
-    var measure: Measurement = Measurement("")
+    var measureList: MutableList<Measurement>? = sizeViewModel.allMeasurements.observeAsState().value?.toMutableList()
 
     Scaffold(
         topBar ={DefaultAppBar(
@@ -46,7 +46,12 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                 openDialog = true
             },
             onSaveClicked = {
-                sizeViewModel.addMeasurement(measure.name, measure.currentSize, measure.previousSize)
+                measureList?.forEach { measurement ->
+                    sizeViewModel.updateMeasurement(measurement)
+                    if(measureList.indexOf(measurement) == measureList.size - 1)
+                        showToast(context,"Save was successful")
+                }
+
             }
         )},
     ){
@@ -117,17 +122,41 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     }
                 }
             }
+            setMeasurementList(measureList = measureList,sizeViewModel = sizeViewModel)
 
-                measurements.value?.let {
-                    items(items = measurements.value!!){ measurement ->
-                        MeasurementItem(measurement = measurement,
-                            size = size,
-                            onValueChanged = {
-                                size = it
-                                measure = Measurement(name = measurement.name, currentSize = size.toDouble() , previousSize = measurement.currentSize)
-                        })
-                    }
-                }
+//            measureList?.let {
+//                    items(items = measureList
+//                        .sortedBy { it.name }){ measurement ->
+//                        MeasurementItem(
+//                            measurement = measurement,
+//                            currentSize = measurement.currentSize.toString(),
+//                            onValueChanged = {
+//                                sizeViewModel.onMeasurementItemChanged(
+//                                    size = it,
+//                                    measureList = measureList,
+//                                    measurement = measurement
+//                                )
+//                        })
+//                    }
+//                }
+        }
+    }
+}
+
+fun LazyListScope.setMeasurementList(measureList: MutableList<Measurement>?, sizeViewModel: SizeViewModel){
+    measureList?.let {
+        items(items = measureList
+            .sortedBy { it.name }){ measurement ->
+            MeasurementItem(
+                measurement = measurement,
+                currentSize = measurement.currentSize.toString(),
+                onValueChanged = {
+                    sizeViewModel.onMeasurementItemChanged(
+                        size = it,
+                        measureList = measureList,
+                        measurement = measurement
+                    )
+                })
         }
     }
 }

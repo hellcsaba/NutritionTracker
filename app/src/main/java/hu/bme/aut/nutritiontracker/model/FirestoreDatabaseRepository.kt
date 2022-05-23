@@ -97,8 +97,8 @@ class FirestoreDatabaseRepository {
             }
     }
 
-    fun updateMeasurement(){
-        
+    fun updateMeasurement(day: Day, measurement: Measurement){
+        db.collection("users").document(user?.uid!!).collection("days").document(day.parentId!!).collection("measurements").document(measurement.id!!).set(measurement)
     }
 
     fun deleteMeasurement(id: String){
@@ -123,9 +123,9 @@ class FirestoreDatabaseRepository {
         try {
             val response = db.collection("users")
                 .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.parentId!!).collection("measurements")
-                .get().await().documents.mapNotNull {
-                        snapShot -> snapShot.toObject(Measurement::class.java)
-            }
+                .get().await().documents.mapNotNull { snapShot ->
+                    snapShot.toObject(Measurement::class.java)
+                }
             response?.let{
                 return NetworkSuccess(it)
             }
@@ -133,6 +133,7 @@ class FirestoreDatabaseRepository {
             return NetworkError(exception)
         }
     }
+
 
     @ExperimentalCoroutinesApi
     fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
@@ -148,7 +149,9 @@ class FirestoreDatabaseRepository {
 
     // Parses the document snapshot to the desired object
     private fun getMeasurementItemFromSnapshot(documentSnapshot: DocumentSnapshot) : Measurement {
-        return documentSnapshot.toObject(Measurement::class.java)!!
+        val measurement = documentSnapshot.toObject(Measurement::class.java)!!
+        measurement.id = documentSnapshot.id
+        return measurement
     }
 
     suspend fun getDay(userID: String): NetworkResult<Any> {

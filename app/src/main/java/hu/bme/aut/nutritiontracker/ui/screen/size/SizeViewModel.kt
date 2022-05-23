@@ -44,7 +44,7 @@ class SizeViewModel:ViewModel() {
             }
 
             selectedDay.value?.let {
-                when (val response = firestoreRepository.getMeasurements(it[1])) {
+                when (val response = firestoreRepository.getMeasurements(it[0])) {
                     is NetworkSuccess -> {
                         _measurement.postValue(response.value as List<Measurement>)
                         Log.d("SizeViewModelMeasurement", response.value.toString())
@@ -56,7 +56,7 @@ class SizeViewModel:ViewModel() {
                 }
 
 
-                firestoreRepository.getMeasurementsFlow(it[1]).collect{
+                firestoreRepository.getMeasurementsFlow(it[0]).collect{
                     _allMeasurements.postValue(it)
                 }
 
@@ -66,12 +66,11 @@ class SizeViewModel:ViewModel() {
 
     fun addMeasurement(name: String, currentSize: Double?, previousSize: Double?){
         val measurement = Measurement(name = name, currentSize = currentSize, previousSize = previousSize)
-        firestoreRepository.addMeasurement(day = selectedDay.value?.get(1)!!,measurement = measurement)
+        firestoreRepository.addMeasurement(day = selectedDay.value?.get(0)!!,measurement = measurement)
     }
 
-    fun updateMeasurement(name: String, currentSize: Double?, previousSize: Double?){
-        val measurement = Measurement(name = name, currentSize = currentSize, previousSize = previousSize)
-        firestoreRepository.addMeasurement(day = selectedDay.value?.get(1)!!,measurement = measurement)
+    fun updateMeasurement(measurement: Measurement){
+        firestoreRepository.updateMeasurement(day = selectedDay.value?.get(0)!!,measurement = measurement)
     }
 
     fun deleteMeasurement(id: String){
@@ -100,16 +99,33 @@ class SizeViewModel:ViewModel() {
     }
 
 
-    val getAllData: MutableList<Measurement>? = mutableListOf(
-        Measurement("Weight",null, previousSize = 70.0),
-        Measurement("Bodyfat",null, 16.0),
-        Measurement("Chest",null, 120.0),
-        Measurement("Arm (right)", null, 40.0),
-        Measurement("Arm (left)",null, 40.0),
-        Measurement("Waist",null, 40.0),
-        Measurement("Thigh (right)", null,61.2),
-        Measurement("Thigh (left)", null,60.7)
-    )
+    fun onMeasurementItemChanged(size: String, measureList: MutableList<Measurement>, measurement: Measurement) {
+        var idx = -1
+        if (size != "") {
+            measureList.forEach { measure ->
+                if (measure.name.equals(measurement.name))
+                    idx = measureList.indexOf(measure)
+            }
+            val measure = Measurement(
+                id = measurement.id,
+                name = measurement.name,
+                currentSize = size.toDouble(),
+                previousSize = measurement.currentSize
+            )
+            measureList[idx] = measure
+        }
+    }
+
+//    val getAllData: MutableList<Measurement>? = mutableListOf(
+//        Measurement("Weight",null, previousSize = 70.0),
+//        Measurement("Bodyfat",null, 16.0),
+//        Measurement("Chest",null, 120.0),
+//        Measurement("Arm (right)", null, 40.0),
+//        Measurement("Arm (left)",null, 40.0),
+//        Measurement("Waist",null, 40.0),
+//        Measurement("Thigh (right)", null,61.2),
+//        Measurement("Thigh (left)", null,60.7)
+//    )
 
 
 }
