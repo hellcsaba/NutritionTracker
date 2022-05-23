@@ -1,5 +1,7 @@
 package hu.bme.aut.nutritiontracker.ui.screen
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,20 +36,25 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     val context = LocalContext.current
     var openDialog by rememberSaveable { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
+    val measurements = sizeViewModel.allMeasurements.observeAsState()
+    var size: String = ""
+    var measure: Measurement = Measurement("")
 
     Scaffold(
         topBar ={DefaultAppBar(
             onAddClicked = {
                 openDialog = true
             },
-            onSaveClicked = {}
+            onSaveClicked = {
+                sizeViewModel.addMeasurement(measure.name, measure.currentSize, measure.previousSize)
+            }
         )},
     ){
         if(openDialog){
             AddMeasurementDialog(
                 onConfirmClicked = {
                     showToast(context = context, "onConfirmClicked")
-                    sizeViewModel.getAllData?.add(Measurement(name,null,null))
+                    sizeViewModel.addMeasurement(name, 0.0, 0.0)
                     name = ""
                     openDialog = false
                 },
@@ -58,6 +66,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     name = it
                 })
         }
+
         LazyColumn(
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -108,9 +117,15 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     }
                 }
             }
-                if (!sizeViewModel.getAllData.isNullOrEmpty()) {
-                    items(items = sizeViewModel.getAllData) { measurement ->
-                        MeasurementItem(measurement = measurement)
+
+                measurements.value?.let {
+                    items(items = measurements.value!!){ measurement ->
+                        MeasurementItem(measurement = measurement,
+                            size = size,
+                            onValueChanged = {
+                                size = it
+                                measure = Measurement(name = measurement.name, currentSize = size.toDouble() , previousSize = measurement.currentSize)
+                        })
                     }
                 }
         }

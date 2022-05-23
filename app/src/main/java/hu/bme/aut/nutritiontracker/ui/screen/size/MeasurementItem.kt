@@ -27,8 +27,10 @@ import java.util.*
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun MeasurementItem(measurement: Measurement) {
-    var size by remember {mutableStateOf("")}
+fun MeasurementItem(measurement: Measurement,
+                    size: String,
+                    onValueChanged: (String) -> Unit) {
+    //var size by remember {mutableStateOf("")}
     Card(
         shape = RoundedCornerShape(6.dp)
     ) {
@@ -80,7 +82,7 @@ fun MeasurementItem(measurement: Measurement) {
             ) {
                 BasicTextField(
                     value = size,
-                    onValueChange = { size = it },
+                    onValueChange = { onValueChanged(size) },
                     modifier = Modifier
                         .width(50.dp)
                         .height(40.dp)
@@ -107,6 +109,8 @@ fun MeasurementItemPreview() {
             name = "Weight",
             previousSize = 70.0,
             currentSize = 0.0
-        )
+        ),
+        size = "",
+        onValueChanged = {}
     )
 }
