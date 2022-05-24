@@ -18,6 +18,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import hu.bme.aut.nutritiontracker.data.Recipe
+import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 @OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
@@ -25,7 +26,7 @@ import hu.bme.aut.nutritiontracker.data.Recipe
 fun RecipePreviewItem(recipe: Recipe, onClick: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp),
+        shape = Shapes.small,
         elevation = 8.dp,
         onClick = onClick
     ){

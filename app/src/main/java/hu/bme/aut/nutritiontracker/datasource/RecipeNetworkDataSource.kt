@@ -13,7 +13,8 @@ const val RECIPE_APIKEY = "1cc3f4b2574241cf961033b15b12f621"
 
 object RecipeNetworkDataSource {
     fun getRecipesList(name: String?): MutableLiveData<RecipeListResult>{
-        val call = RetrofitClient.apiInterface.getRecipesList(RECIPE_APIKEY, name)
+        RetrofitClient.setSpoonacularRetrofitClient()
+        val call = RetrofitClient.recipeApiInterface.getRecipesList(RECIPE_APIKEY, name)
 
         val RecipeListResultData = MutableLiveData<RecipeListResult>()
 
@@ -32,7 +33,8 @@ object RecipeNetworkDataSource {
     }
 
     fun getRecipeDetail(id: Int): MutableLiveData<RecipeDetailResult>{
-        val call = RetrofitClient.apiInterface.getRecipe(id ,RECIPE_APIKEY)
+        RetrofitClient.setSpoonacularRetrofitClient()
+        val call = RetrofitClient.recipeApiInterface.getRecipe(id ,RECIPE_APIKEY)
 
         val RecipeDetailResultData = MutableLiveData<RecipeDetailResult>()
 

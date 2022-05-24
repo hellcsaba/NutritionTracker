@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomBarScreen
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomNavGraph
 
+@ExperimentalMaterialApi
 @Composable
 fun MainScreen(navController: NavHostController) {
     val scaffoldState = rememberScaffoldState()
