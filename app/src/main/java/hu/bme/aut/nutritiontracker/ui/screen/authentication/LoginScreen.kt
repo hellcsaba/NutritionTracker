@@ -1,6 +1,5 @@
 package hu.bme.aut.nutritiontracker
 
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast

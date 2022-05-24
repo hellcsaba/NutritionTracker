@@ -40,7 +40,6 @@ object FirebaseAuthRepository
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("EmailPassword", "signInWithEmail:success")
-                        Log.d("EmailPassword", auth.currentUser?.uid.toString())
                         loggedInLiveData.postValue(true)
                         userLiveData.postValue(auth.currentUser)
                     } else {
@@ -76,8 +75,9 @@ object FirebaseAuthRepository
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("EmailPassword", "createUserWithEmail:success")
-                    Firebase.firestore.collection("users").document(auth.currentUser?.uid!!).set(User())
-                    val user = auth.currentUser
+                    val user = User()
+                    user.email =  auth.currentUser?.email!!
+                    Firebase.firestore.collection("users").document(auth.currentUser?.uid!!).set(user)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("EmailPassword", "createUserWithEmail:failure", task.exception)

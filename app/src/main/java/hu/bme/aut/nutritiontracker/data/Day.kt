@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.*
 
 data class Day(
-    var parentId: String? = null,
+    var id: String? = null,
     var day: Date = Date(),
     var consumedFood: List<ConsumedFood> = emptyList(),
     var kcalLimit: Int = 0,

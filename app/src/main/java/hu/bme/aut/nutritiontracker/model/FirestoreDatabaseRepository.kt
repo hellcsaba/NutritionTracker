@@ -63,83 +63,50 @@ class FirestoreDatabaseRepository {
         }
     }
 
-    suspend fun getMeasurements(day: Day): NetworkResult<Any> {
-        try {
-//            val start = Date(day.time)
-//            val end = Date(day.time)
-//            start.hours = 0
-//            start.minutes = 0
-//            start.seconds = 0
-//            end.hours = 23
-//            end.minutes = 59
-//            end.seconds = 59
-//            val responseDay = db.collection("users").document(user?.uid!!).collection("days")
-//                .whereGreaterThan("day", start)
-//                .whereLessThanOrEqualTo("day", end)
-//                .get().await().documents.
-
-            val response = db.collection("users").document(user?.uid!!).collection("days").document(day.parentId!!).collection("measurements")
-                .get().await().toObjects(Measurement::class.java)
-            response?.let{
-                return NetworkSuccess(it)
+    suspend fun addDay(date: Date = Date(), day: Day = Day()){
+        val start = Date(date.time)
+        val end = Date(date.time)
+        start.hours = 0
+        start.minutes = 0
+        start.seconds = 0
+        end.hours = 23
+        end.minutes = 59
+        end.seconds = 59
+        //Check whether the day exists
+        val response = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid!!).collection("days")
+            .whereGreaterThan("day", start)
+            .whereLessThanOrEqualTo("day", end)
+            .get().await().documents.map{ documentSnapshot ->
+                val res = documentSnapshot.toObject(Day::class.java)!!
+                res.id = documentSnapshot.id
             }
-            return NetworkError(Exception("Get user data error"))
-        } catch (exception: Exception) {
-            return NetworkError(exception)
-        }
+
+        if(response.isEmpty())
+            db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").add(day)
+                .addOnSuccessListener {
+                    //set the id of the day
+                    db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(it.id).update("id", it.id)
+                    Log.d(TAG, "Day was added successfully!")
+                }
+                .addOnFailureListener { e -> Log.w(TAG, "Error adding day document", e) }
     }
 
-
     fun addMeasurement(day: Day, measurement: Measurement){
-        db.collection("users").document(user?.uid!!).collection("days").document(day.parentId!!).collection("measurements").add(measurement)
+        db.collection("users").document(user?.uid!!).collection("days").document(day.id!!).collection("measurements").add(measurement)
             .addOnCompleteListener{
-                Log.d("FirestoreRepo", "measurement added")
+                Log.d(TAG, "measurement added")
             }
     }
 
     fun updateMeasurement(day: Day, measurement: Measurement){
-        db.collection("users").document(user?.uid!!).collection("days").document(day.parentId!!).collection("measurements").document(measurement.id!!).set(measurement)
+        db.collection("users").document(user?.uid!!).collection("days").document(day.id!!).collection("measurements").document(measurement.id!!).set(measurement)
     }
-
-    fun deleteMeasurement(id: String){
-        db.collection("users").document(user?.uid!!).collection("measurements").document(id)
-            .delete()
-            .addOnSuccessListener {  Log.d(TAG, "DocumentSnapshot successfully deleted!")  }
-            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-    }
-
-    fun addDayToCollection(){
-        db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").add(Day())
-            .addOnSuccessListener {  Log.d(TAG, "Day was added successfully!")  }
-            .addOnFailureListener { e -> Log.w(TAG, "Error adding day document", e) }
-    }
-
-
-    fun createUser(user: User, userID: String){
-        db.collection("users").document(userID).set(user)
-    }
-
-    suspend fun getAllMeasurements(day: Day): NetworkResult<Any> {
-        try {
-            val response = db.collection("users")
-                .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.parentId!!).collection("measurements")
-                .get().await().documents.mapNotNull { snapShot ->
-                    snapShot.toObject(Measurement::class.java)
-                }
-            response?.let{
-                return NetworkSuccess(it)
-            }
-        } catch (exception: Exception) {
-            return NetworkError(exception)
-        }
-    }
-
 
     @ExperimentalCoroutinesApi
     fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
         return db
             .collection("users")
-            .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.parentId!!).collection("measurements")
+            .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("measurements")
             .getDataFlow { querySnapshot ->
                 querySnapshot?.documents?.map {
                     getMeasurementItemFromSnapshot(it)
@@ -153,20 +120,6 @@ class FirestoreDatabaseRepository {
         measurement.id = documentSnapshot.id
         return measurement
     }
-
-    suspend fun getDay(userID: String): NetworkResult<Any> {
-        try {
-            val response = db.collection("users").document(userID).get().await().toObject(User::class.java)
-            response?.let{
-                return NetworkSuccess(it)
-            }
-            return NetworkError(Exception("Get user data error"))
-        } catch (exception: Exception) {
-            return NetworkError(exception)
-        }
-    }
-
-
 }
 
 

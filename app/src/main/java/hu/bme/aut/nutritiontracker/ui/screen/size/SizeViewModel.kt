@@ -18,17 +18,12 @@ import kotlinx.coroutines.flow.collect
 class SizeViewModel:ViewModel() {
     val firestoreRepository = FirestoreDatabaseRepository()
     private val _userProfile = MutableLiveData<User>()
-    val userProfile: LiveData<User> = _userProfile
 
     private val _allMeasurements = MutableLiveData<List<Measurement>>()
     val allMeasurements: LiveData<List<Measurement>> = _allMeasurements
 
     private val _selectedDay = MutableLiveData<List<Day>>()
     val selectedDay: LiveData<List<Day>> = _selectedDay
-
-    private val _measurement = MutableLiveData<List<Measurement>>()
-    val measurement: LiveData<List<Measurement>> = _measurement
-
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -44,20 +39,8 @@ class SizeViewModel:ViewModel() {
             }
 
             selectedDay.value?.let {
-                when (val response = firestoreRepository.getMeasurements(it[0])) {
-                    is NetworkSuccess -> {
-                        _measurement.postValue(response.value as List<Measurement>)
-                        Log.d("SizeViewModelMeasurement", response.value.toString())
-                    }
-                    is NetworkError -> Log.d(
-                        "SizeViewModelMeasurement",
-                        response.errorMessage.toString()
-                    )
-                }
-
-
-                firestoreRepository.getMeasurementsFlow(it[0]).collect{
-                    _allMeasurements.postValue(it)
+                firestoreRepository.getMeasurementsFlow(it[0]).collect{ list ->
+                    _allMeasurements.postValue(list)
                 }
 
             }
@@ -72,32 +55,6 @@ class SizeViewModel:ViewModel() {
     fun updateMeasurement(measurement: Measurement){
         firestoreRepository.updateMeasurement(day = selectedDay.value?.get(0)!!,measurement = measurement)
     }
-
-    fun deleteMeasurement(id: String){
-        firestoreRepository.deleteMeasurement(id)
-    }
-
-    fun addDay(){
-        firestoreRepository.addDayToCollection()
-    }
-
-    fun getAllMeasurements(day: Day){
-        viewModelScope.launch(Dispatchers.IO) {
-            when(val response = firestoreRepository.getAllMeasurements(day)){
-                is NetworkSuccess -> _allMeasurements.postValue(response.value as List<Measurement>)
-                is NetworkError -> Log.d("SizeViewModel", response.errorMessage.toString())
-            }
-        }
-    }
-
-    fun collectMeasurementData(day: Day){
-        viewModelScope.launch {
-            firestoreRepository.getMeasurementsFlow(day).collect{
-                _allMeasurements.postValue(it)
-            }
-        }
-    }
-
 
     fun onMeasurementItemChanged(size: String, measureList: MutableList<Measurement>, measurement: Measurement) {
         var idx = -1
@@ -115,17 +72,5 @@ class SizeViewModel:ViewModel() {
             measureList[idx] = measure
         }
     }
-
-//    val getAllData: MutableList<Measurement>? = mutableListOf(
-//        Measurement("Weight",null, previousSize = 70.0),
-//        Measurement("Bodyfat",null, 16.0),
-//        Measurement("Chest",null, 120.0),
-//        Measurement("Arm (right)", null, 40.0),
-//        Measurement("Arm (left)",null, 40.0),
-//        Measurement("Waist",null, 40.0),
-//        Measurement("Thigh (right)", null,61.2),
-//        Measurement("Thigh (left)", null,60.7)
-//    )
-
 
 }

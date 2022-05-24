@@ -1,18 +1,36 @@
 package hu.bme.aut.nutritiontracker.ui.screen.authentication
 
 
+import android.util.Log
 import androidx.lifecycle.*
+import hu.bme.aut.nutritiontracker.data.Day
 import hu.bme.aut.nutritiontracker.data.RecipeListResult
+import hu.bme.aut.nutritiontracker.data.User
 import hu.bme.aut.nutritiontracker.model.FirebaseAuthRepository
 import hu.bme.aut.nutritiontracker.model.FirestoreDatabaseRepository
+import hu.bme.aut.nutritiontracker.util.NetworkError
+import hu.bme.aut.nutritiontracker.util.NetworkSuccess
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.security.auth.callback.Callback
 
 class AuthenticationViewModel: ViewModel(){
-
-    //private val FirebaseAuthRepository = FirebaseAuthRepository()
     private val firestoreDatabaseRepository = FirestoreDatabaseRepository()
     private val _loggedIn : MutableLiveData<Boolean> = FirebaseAuthRepository.loggedInLiveData
+    private val _selectedDay: MutableLiveData<List<Day>> = MutableLiveData<List<Day>>()
     val loggedIn : LiveData<Boolean> = _loggedIn
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val response = firestoreDatabaseRepository.getDay()) {
+                is NetworkSuccess -> {
+                    _selectedDay.postValue(response.value as List<Day>)
+                    Log.d("AuthenticationViewModel", response.value.toString())
+                }
+                is NetworkError -> Log.d("AuthenticationViewModel", response.errorMessage.toString())
+            }
+        }
+    }
 
     private lateinit var owner: LifecycleOwner
     fun attach(lifeCycleOwner: LifecycleOwner){
@@ -33,6 +51,11 @@ class AuthenticationViewModel: ViewModel(){
                 override fun onChanged(res: Boolean?) {
                     _loggedIn.value = res
                     onChanged()
+                    //if(_selectedDay.value.isNullOrEmpty())
+                    if(res!!)
+                        viewModelScope.launch(Dispatchers.IO) {
+                            firestoreDatabaseRepository.addDay()
+                        }
                 }
 
             }

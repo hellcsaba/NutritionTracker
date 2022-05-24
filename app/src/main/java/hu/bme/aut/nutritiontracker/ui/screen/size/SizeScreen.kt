@@ -1,7 +1,5 @@
 package hu.bme.aut.nutritiontracker.ui.screen
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,7 +27,6 @@ import hu.bme.aut.nutritiontracker.showToast
 import hu.bme.aut.nutritiontracker.ui.screen.size.AddMeasurementDialog
 import hu.bme.aut.nutritiontracker.ui.screen.size.MeasurementItem
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
-import java.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -122,23 +119,8 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     }
                 }
             }
-            setMeasurementList(measureList = measureList,sizeViewModel = sizeViewModel)
 
-//            measureList?.let {
-//                    items(items = measureList
-//                        .sortedBy { it.name }){ measurement ->
-//                        MeasurementItem(
-//                            measurement = measurement,
-//                            currentSize = measurement.currentSize.toString(),
-//                            onValueChanged = {
-//                                sizeViewModel.onMeasurementItemChanged(
-//                                    size = it,
-//                                    measureList = measureList,
-//                                    measurement = measurement
-//                                )
-//                        })
-//                    }
-//                }
+            setMeasurementList(measureList = measureList,sizeViewModel = sizeViewModel)
         }
     }
 }
