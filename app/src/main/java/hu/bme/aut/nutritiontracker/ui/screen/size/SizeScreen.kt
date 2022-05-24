@@ -4,12 +4,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +27,6 @@ import hu.bme.aut.nutritiontracker.showToast
 import hu.bme.aut.nutritiontracker.ui.screen.size.AddMeasurementDialog
 import hu.bme.aut.nutritiontracker.ui.screen.size.MeasurementItem
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
-import java.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,20 +34,29 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     val context = LocalContext.current
     var openDialog by rememberSaveable { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
+    val measurements = sizeViewModel.allMeasurements.observeAsState()
+    var measureList: MutableList<Measurement>? = sizeViewModel.allMeasurements.observeAsState().value?.toMutableList()
 
     Scaffold(
         topBar ={DefaultAppBar(
             onAddClicked = {
                 openDialog = true
             },
-            onSaveClicked = {}
+            onSaveClicked = {
+                measureList?.forEach { measurement ->
+                    sizeViewModel.updateMeasurement(measurement)
+                    if(measureList.indexOf(measurement) == measureList.size - 1)
+                        showToast(context,"Save was successful")
+                }
+
+            }
         )},
     ){
         if(openDialog){
             AddMeasurementDialog(
                 onConfirmClicked = {
                     showToast(context = context, "onConfirmClicked")
-                    sizeViewModel.getAllData?.add(Measurement(name,null,null))
+                    sizeViewModel.addMeasurement(name, 0.0, 0.0)
                     name = ""
                     openDialog = false
                 },
@@ -58,6 +68,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     name = it
                 })
         }
+
         LazyColumn(
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -108,11 +119,26 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
                     }
                 }
             }
-                if (!sizeViewModel.getAllData.isNullOrEmpty()) {
-                    items(items = sizeViewModel.getAllData) { measurement ->
-                        MeasurementItem(measurement = measurement)
-                    }
-                }
+
+            setMeasurementList(measureList = measureList,sizeViewModel = sizeViewModel)
+        }
+    }
+}
+
+fun LazyListScope.setMeasurementList(measureList: MutableList<Measurement>?, sizeViewModel: SizeViewModel){
+    measureList?.let {
+        items(items = measureList
+            .sortedBy { it.name }){ measurement ->
+            MeasurementItem(
+                measurement = measurement,
+                currentSize = measurement.currentSize.toString(),
+                onValueChanged = {
+                    sizeViewModel.onMeasurementItemChanged(
+                        size = it,
+                        measureList = measureList,
+                        measurement = measurement
+                    )
+                })
         }
     }
 }

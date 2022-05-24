@@ -1,6 +1,5 @@
 package hu.bme.aut.nutritiontracker
 
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,13 +34,14 @@ import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.nutritiontracker.ui.screen.authentication.AuthenticationViewModel
 
 @Composable
-fun LoginScreen(authenticationViewModel: AuthenticationViewModel = AuthenticationViewModel(), navController: NavController,
+fun LoginScreen(authenticationViewModel: AuthenticationViewModel, navController: NavController,
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val loggedIn by authenticationViewModel.loggedIn.observeAsState()
 
     val icon = if (passwordVisibility)
         painterResource(id = R.drawable.ic_baseline_visibility_24)
@@ -133,16 +134,22 @@ fun LoginScreen(authenticationViewModel: AuthenticationViewModel = Authenticatio
         Button(
             modifier = Modifier.fillMaxWidth(0.5f),
             onClick = {
-                if(true){
-                //if (authenticationViewModel.signIn(email, password)) {
-                    navController.navigate(Screen.MainScreen.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
+                authenticationViewModel.signIn(email = email, password = password,
+                    onChanged = {
+                        loggedIn?.let {
+                            if (loggedIn!!) {
+                                Log.d("Loginscreen",loggedIn.toString())
+                                navController.navigate(Screen.MainScreen.route) {
+                                    popUpTo(navController.graph.startDestinationId)
+                                    launchSingleTop = true
+                                }
+                            }
+                            else {
+                                showToast(context, "Authentication failed.")
+                            }
+                        }
                     }
-                } else {
-                    showToast(context, "Authentication failed.")
-                    Log.d("LoginScreen", "SignIn button clicked")
-                }
+                )
             }, colors = ButtonDefaults.textButtonColors(
                 backgroundColor = MaterialTheme.colors.primary
             ),
@@ -165,5 +172,5 @@ fun showToast(context: Context, msg:String){
 fun LoginScreenPreview() {
     LoginScreen(
         navController = rememberNavController(),
-    )
+    authenticationViewModel = AuthenticationViewModel())
 }

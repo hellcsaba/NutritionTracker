@@ -1,34 +1,33 @@
 package hu.bme.aut.nutritiontracker.ui.screen.size
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hu.bme.aut.nutritiontracker.data.Measurement
-import java.text.SimpleDateFormat
-import java.util.*
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun MeasurementItem(measurement: Measurement) {
+fun MeasurementItem(measurement: Measurement,
+                    currentSize: String,
+                    onValueChanged: (String) -> Unit) {
     var size by remember {mutableStateOf("")}
+    size = currentSize // to refresh also if new measurement was added
     Card(
         shape = RoundedCornerShape(6.dp)
     ) {
@@ -80,7 +79,10 @@ fun MeasurementItem(measurement: Measurement) {
             ) {
                 BasicTextField(
                     value = size,
-                    onValueChange = { size = it },
+                    onValueChange = {
+                        size = it
+                        onValueChanged(it)
+                    },
                     modifier = Modifier
                         .width(50.dp)
                         .height(40.dp)
@@ -107,6 +109,8 @@ fun MeasurementItemPreview() {
             name = "Weight",
             previousSize = 70.0,
             currentSize = 0.0
-        )
+        ),
+        currentSize = "",
+        onValueChanged = {}
     )
 }
