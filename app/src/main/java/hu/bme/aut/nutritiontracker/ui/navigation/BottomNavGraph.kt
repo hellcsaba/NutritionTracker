@@ -16,6 +16,7 @@ import hu.bme.aut.nutritiontracker.MainActivity
 import hu.bme.aut.nutritiontracker.Screen
 import hu.bme.aut.nutritiontracker.ui.screen.*
 import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
+import hu.bme.aut.nutritiontracker.ui.screen.diary.FoodSearchScreen
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeDetailScreen
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
@@ -25,12 +26,13 @@ import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
     val recipeViewModel = RecipeViewModel()
+    val diaryViewModel = DiaryViewModel()
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Diary.route
     ) {
         composable(route = BottomBarScreen.Diary.route) {
-            DiaryScreen(diaryViewModel = DiaryViewModel())
+            DiaryScreen(diaryViewModel = diaryViewModel, navController = navController)
         }
         composable(route = BottomBarScreen.Profile.route) {
             ProfileScreen()
@@ -52,6 +54,9 @@ fun BottomNavGraph(navController: NavHostController) {
             })
         ){
             RecipeDetailScreen(recipeViewModel = recipeViewModel)
+        }
+        composable(route = Screen.FoodSearchScreen.route){
+            FoodSearchScreen(diaryViewModel = diaryViewModel, navController = navController)
         }
     }
 }

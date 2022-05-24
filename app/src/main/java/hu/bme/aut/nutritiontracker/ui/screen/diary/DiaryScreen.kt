@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import hu.bme.aut.nutritiontracker.data.MacroNutrition
 import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
 import hu.bme.aut.nutritiontracker.ui.theme.Shapes
@@ -22,7 +23,7 @@ import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 @ExperimentalMaterialApi
 @Composable
-fun DiaryScreen(diaryViewModel: DiaryViewModel) {
+fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
     Scaffold(
         topBar ={TopAppBar(
             title = {
@@ -38,7 +39,11 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                 kcalLimit = 2300,
                 consumed = 1500
             )
-            AddFoodConsumptionCard()
+            AddFoodConsumptionCard(
+                onClick = {
+                    navController.navigate(route = "food_search_screen")
+                }
+            )
             AddWaterConsumptionCard(2.0)
         }
     }
@@ -127,11 +132,13 @@ fun RowScope.spaceEvenlyTextRow(string1: String, string2: String, string3 : Stri
         modifier = Modifier.weight(1f))
 }
 
+@ExperimentalMaterialApi
 @Composable
-fun AddFoodConsumptionCard(){
+fun AddFoodConsumptionCard(onClick: ()->Unit){
     Card(
         elevation = 8.dp,
         backgroundColor = Color.LightGray,
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -226,5 +233,5 @@ fun AddWaterConsumptionCard(currentWater: Double){
 @Composable
 @Preview
 fun DiaryScreenPreview() {
-    DiaryScreen(diaryViewModel = DiaryViewModel())
+    //DiaryScreen(diaryViewModel = DiaryViewModel(), navController = NavController())
 }

@@ -1,58 +1,58 @@
-package hu.bme.aut.nutritiontracker.ui.screen.recipe
+package hu.bme.aut.nutritiontracker.ui.screen.diary
 
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.AsyncImagePainter
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.*
+import hu.bme.aut.nutritiontracker.data.Food
 import hu.bme.aut.nutritiontracker.data.Recipe
 import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 @OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
 @Composable
-fun RecipePreviewItem(recipe: Recipe, onClick: () -> Unit){
+fun DiaryPreviewItem(food: Food, onClick: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = Shapes.small,
         elevation = 8.dp,
         onClick = onClick
     ){
-        Column()
+        Row()
         {
-            val painter = rememberImagePainter(data = recipe.image)
-            Image(
-                painter = painter,
-                contentDescription = "Recipe Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
+            Log.d(TAG,food.image.toString())
+            SubcomposeAsyncImage(
+                model = food.image,
+                loading = {
+                    CircularProgressIndicator()
+                },
+                contentDescription = "Food Image",
                 contentScale = ContentScale.Crop,
+                alignment = Alignment.CenterStart,
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(50.dp)
+                )
 
-            )
-            if(painter.state is AsyncImagePainter.State.Loading){
-                CircularProgressIndicator()
-            }
-
-            recipe.title?.let{ title ->
-                Log.d("Title", title)
+            food.label?.let{ title ->
+                Log.d(TAG,title)
                 Text(
                     text = title,
                     modifier = Modifier
-                        .align(Alignment.Start)
+                        .align(CenterVertically)
                         .padding(12.dp),
                     fontSize = 16.sp
                 )

@@ -1,6 +1,7 @@
 package hu.bme.aut.nutritiontracker
 
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LifecycleOwner
@@ -14,6 +15,7 @@ import hu.bme.aut.nutritiontracker.ui.screen.*
 import hu.bme.aut.nutritiontracker.ui.screen.authentication.AuthenticationViewModel
 
 
+@ExperimentalMaterialApi
 @Composable
 fun SetupNavGraph() {
     val navController = rememberNavController()
