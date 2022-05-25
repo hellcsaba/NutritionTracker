@@ -24,7 +24,7 @@ import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 @OptIn(ExperimentalMaterialApi::class)
 @ExperimentalCoilApi
 @Composable
-fun DiaryPreviewItem(food: Food, onClick: () -> Unit){
+fun FoodSearchItem(food: Food, onClick: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = Shapes.small,

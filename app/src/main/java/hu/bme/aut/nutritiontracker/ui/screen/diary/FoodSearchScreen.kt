@@ -6,14 +6,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import hu.bme.aut.nutritiontracker.data.Food
+import hu.bme.aut.nutritiontracker.showToast
 import hu.bme.aut.nutritiontracker.ui.screen.DefaultAppBar
 import hu.bme.aut.nutritiontracker.ui.screen.searchwidget.SearchAppBar
 import hu.bme.aut.nutritiontracker.ui.screen.searchwidget.SearchWidgetState
+import hu.bme.aut.nutritiontracker.ui.screen.size.AddMeasurementDialog
 
 const val TAG = "FoodSearchScreen"
 
@@ -22,6 +25,8 @@ fun FoodSearchScreen(diaryViewModel: DiaryViewModel, navController: NavControlle
     val searchWidgetState by diaryViewModel.searchWidgetState
     val searchTextState by diaryViewModel.searchTextState
     val searchedFoodResult by diaryViewModel.searchedFoodResult.observeAsState()
+    var openDialog by rememberSaveable { mutableStateOf(false) }
+    var measure by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -43,6 +48,25 @@ fun FoodSearchScreen(diaryViewModel: DiaryViewModel, navController: NavControlle
             )
         }
     ) {
+        if(openDialog){
+            AddConsumedFoodDialog(
+                onConfirmClicked = {
+                    if(measure.isNotEmpty()) {
+                        diaryViewModel.addConsumedFood(measure)
+                        measure = ""
+                    }
+                    openDialog = false
+                },
+                onDismiss = {
+                    measure = ""
+                    openDialog = false
+                },
+                measure = measure,
+                onMeasureChanged = {
+                    measure = it
+                },
+                food = diaryViewModel.selectedFood)
+        }
         LazyColumn(
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -50,11 +74,11 @@ fun FoodSearchScreen(diaryViewModel: DiaryViewModel, navController: NavControlle
             searchedFoodResult?.let { result ->
                 result.hints?.let {  hint ->
                     items(items = hint) {
-                        DiaryPreviewItem(food = it.food,
+                        FoodSearchItem(food = it.food!!,
                             onClick = {
+                                openDialog = true
+                                diaryViewModel.selectedFood = it.food
                                 Log.d(TAG, "OnClick")
-//                                diaryViewModel.getRecipeDetail(recipe.id!!)
-//                                navController.navigate(route = "recipe_detail_screen/"+recipe.id)
                             }
                         )
                     }
@@ -78,6 +102,7 @@ fun FoodSearchAppBar(
     when (searchWidgetState) {
         SearchWidgetState.CLOSED -> {
             DefaultAppBar(
+                title = "Search foods",
                 onSearchClicked = onSearchTriggered
             )
         }

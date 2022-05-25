@@ -1,26 +1,40 @@
 package hu.bme.aut.nutritiontracker.ui.screen
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import hu.bme.aut.nutritiontracker.R
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import hu.bme.aut.nutritiontracker.data.ConsumedFood
 import hu.bme.aut.nutritiontracker.data.MacroNutrition
+import hu.bme.aut.nutritiontracker.data.Measurement
+import hu.bme.aut.nutritiontracker.ui.screen.diary.ConsumedFoodItem
 import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
+import hu.bme.aut.nutritiontracker.ui.screen.size.MeasurementItem
+import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
@@ -33,21 +47,37 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
             }
         )},
     ){
-        Column {
-            MacroDetailCard(
-                macroTotal = MacroNutrition(150, 150, 50),
-                kcalLimit = 2300,
-                consumed = 1500
-            )
-            AddFoodConsumptionCard(
-                onClick = {
-                    navController.navigate(route = "food_search_screen")
-                }
-            )
-            AddWaterConsumptionCard(2.0)
+        LazyColumn(
+            contentPadding = PaddingValues(all = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item{
+                MacroDetailCard(
+                    macroTotal = MacroNutrition(150, 150, 50),
+                    kcalLimit = 2300,
+                    consumed = 1500
+                )
+                AddFoodConsumptionCard(
+                    onClick = {
+                        navController.navigate(route = "food_search_screen")
+                    }
+                )
+                AddWaterConsumptionCard(2.0)
+            }
+
+            setConsumedFoodsList(foodList = diaryViewModel.consumedFoodList, diaryViewModel = diaryViewModel)
         }
     }
 }
+
+@ExperimentalMaterialApi
+fun LazyListScope.setConsumedFoodsList(foodList: List<ConsumedFood>, diaryViewModel: DiaryViewModel){
+        items(items = foodList){ consumedFood ->
+            ConsumedFoodItem(food = consumedFood)
+        }
+
+}
+
 
 @ExperimentalMaterialApi
 @Composable
@@ -57,7 +87,8 @@ fun MacroDetailCard(macroTotal: MacroNutrition, kcalLimit: Int, consumed: Int, m
         backgroundColor = Color.LightGray,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
+            .shadow(10.dp,shape = Shapes.medium)
             .clip(Shapes.medium),
         onClick = {}
 
@@ -141,7 +172,8 @@ fun AddFoodConsumptionCard(onClick: ()->Unit){
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
+            .shadow(8.dp,shape = Shapes.medium)
             .clip(Shapes.medium)
     ){
         Column(
@@ -170,7 +202,8 @@ fun AddWaterConsumptionCard(currentWater: Double){
         backgroundColor = colorResource(R.color.waterBlue),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
+            .shadow(8.dp,shape = Shapes.medium)
             .clip(Shapes.medium)
     ){
         Column(

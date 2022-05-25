@@ -77,6 +77,7 @@ fun RecipeAppBar(
     when (searchWidgetState) {
         SearchWidgetState.CLOSED -> {
             DefaultAppBar(
+                title = "Recipes",
                 onSearchClicked = onSearchTriggered
             )
         }
@@ -94,11 +95,13 @@ fun RecipeAppBar(
 
 
 @Composable
-fun DefaultAppBar(onSearchClicked: () -> Unit) {
+fun DefaultAppBar(
+    title: String,
+    onSearchClicked: () -> Unit) {
     TopAppBar(
         title = {
             Text(
-                text = "Recipes"
+                text = title
             )
         },
         actions = {

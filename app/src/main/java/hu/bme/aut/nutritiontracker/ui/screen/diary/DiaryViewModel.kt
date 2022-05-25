@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.bme.aut.nutritiontracker.data.ConsumedFood
 import hu.bme.aut.nutritiontracker.data.Day
 import hu.bme.aut.nutritiontracker.data.Food
 import hu.bme.aut.nutritiontracker.data.FoodResult
@@ -22,6 +23,9 @@ class DiaryViewModel : ViewModel() {
     private val diaryRepository = DiaryRepository()
     private val _searchedFoodResult = MutableLiveData<FoodResult>()
     val searchedFoodResult: LiveData<FoodResult> = _searchedFoodResult
+    val _consumedFoodList = mutableListOf<ConsumedFood>()
+    val consumedFoodList: List<ConsumedFood> = _consumedFoodList
+    var selectedFood = Food()
 
     private val _searchWidgetState: MutableState<SearchWidgetState> =
         mutableStateOf(value = SearchWidgetState.CLOSED)
@@ -47,6 +51,20 @@ class DiaryViewModel : ViewModel() {
                 is NetworkError -> Log.d(TAG, response.errorMessage.toString())
             }
         }
+    }
+
+    fun addConsumedFood(amount: String){
+        val scale = amount.toInt() / 100
+        val countedFood = ConsumedFood(
+            name = selectedFood.label!!,
+            amount = amount.toInt(),
+            kcal = (selectedFood.nutrients!!.ENERC_KCAL!! * scale).toInt(),
+            carb = (selectedFood.nutrients!!.CHOCDF!! * scale).toInt(),
+            protein = (selectedFood.nutrients!!.PROCNT!! * scale).toInt(),
+            fat = (selectedFood.nutrients!!.FAT!! * scale).toInt(),
+            image = selectedFood.image
+        )
+        _consumedFoodList.add(countedFood)
     }
 
     companion object{
