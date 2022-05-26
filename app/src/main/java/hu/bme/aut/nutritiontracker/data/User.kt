@@ -6,4 +6,5 @@ data class User (
     var days: List<Day> = emptyList(),
     var bodyComposition: BodyComposition = BodyComposition(),
     var macroTotal: MacroNutrition = MacroNutrition(),
+    var consumedFood: List<ConsumedFood> = emptyList()
 )

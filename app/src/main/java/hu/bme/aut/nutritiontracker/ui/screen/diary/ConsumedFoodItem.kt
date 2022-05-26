@@ -69,7 +69,7 @@ fun ConsumedFoodItem(food: ConsumedFood) {
                     modifier = Modifier
                         .height(50.dp)
                         .width(50.dp)
-                        .weight(1f)
+                        .weight(1.5f)
                 )
 
                 Text(

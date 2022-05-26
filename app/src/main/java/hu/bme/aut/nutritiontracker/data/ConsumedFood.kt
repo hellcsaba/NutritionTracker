@@ -1,6 +1,7 @@
 package hu.bme.aut.nutritiontracker.data
 
 data class ConsumedFood(
+    var id: String? = null,
     var name: String = "",
     var amount: Int? = null,
     var kcal: Int? = null,

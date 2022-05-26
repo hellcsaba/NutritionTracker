@@ -34,7 +34,6 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     val context = LocalContext.current
     var openDialog by rememberSaveable { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
-    val measurements = sizeViewModel.allMeasurements.observeAsState()
     var measureList: MutableList<Measurement>? = sizeViewModel.allMeasurements.observeAsState().value?.toMutableList()
 
     Scaffold(

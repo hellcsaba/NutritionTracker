@@ -1,6 +1,7 @@
 package hu.bme.aut.nutritiontracker.ui.screen
 
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import hu.bme.aut.nutritiontracker.R
@@ -11,6 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,7 +21,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,11 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hu.bme.aut.nutritiontracker.data.ConsumedFood
 import hu.bme.aut.nutritiontracker.data.MacroNutrition
-import hu.bme.aut.nutritiontracker.data.Measurement
 import hu.bme.aut.nutritiontracker.ui.screen.diary.ConsumedFoodItem
 import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
-import hu.bme.aut.nutritiontracker.ui.screen.size.MeasurementItem
-import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 
@@ -38,6 +37,10 @@ import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 @ExperimentalMaterialApi
 @Composable
 fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
+    val consumedFoodList by diaryViewModel.consumedFoodList.observeAsState()
+    //diaryViewModel.getDayFlow()
+    val day by diaryViewModel.day.observeAsState()
+    val deltaWater: Double = 0.25
     Scaffold(
         topBar ={TopAppBar(
             title = {
@@ -51,21 +54,36 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item{
-                MacroDetailCard(
-                    macroTotal = MacroNutrition(150, 150, 50),
-                    kcalLimit = 2300,
-                    consumed = 1500
-                )
-                AddFoodConsumptionCard(
-                    onClick = {
-                        navController.navigate(route = "food_search_screen")
-                    }
-                )
-                AddWaterConsumptionCard(2.0)
+            day?.let { day ->
+                item{
+                    MacroDetailCard(
+                        macroTotal = day.macroTotal,
+                        kcalLimit = day.kcalLimit,
+                        consumed = 1500
+                    )
+                    AddFoodConsumptionCard(
+                        onClick = {
+                            navController.navigate(route = "food_search_screen")
+                        }
+                    )
+                    AddWaterConsumptionCard(
+                        currentWater = day.water!!,
+                    onMinusClick = {
+                        var new = day.water!! - deltaWater
+                        if(new < 0.0) new = 0.0
+                        diaryViewModel.updateWaterConsumption(new)
+                    },
+                    onPlusClick = {
+                        val new = day.water!! + deltaWater
+                        diaryViewModel.updateWaterConsumption(new)
+                    })
+                }
             }
 
-            setConsumedFoodsList(foodList = diaryViewModel.consumedFoodList, diaryViewModel = diaryViewModel)
+
+            consumedFoodList?.let { foodList ->
+                setConsumedFoodsList(foodList = foodList, diaryViewModel = diaryViewModel)
+            }
         }
     }
 }
@@ -88,7 +106,7 @@ fun MacroDetailCard(macroTotal: MacroNutrition, kcalLimit: Int, consumed: Int, m
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .shadow(10.dp,shape = Shapes.medium)
+            .shadow(10.dp, shape = Shapes.medium)
             .clip(Shapes.medium),
         onClick = {}
 
@@ -173,7 +191,7 @@ fun AddFoodConsumptionCard(onClick: ()->Unit){
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .shadow(8.dp,shape = Shapes.medium)
+            .shadow(8.dp, shape = Shapes.medium)
             .clip(Shapes.medium)
     ){
         Column(
@@ -196,14 +214,18 @@ fun AddFoodConsumptionCard(onClick: ()->Unit){
 }
 
 @Composable
-fun AddWaterConsumptionCard(currentWater: Double){
+fun AddWaterConsumptionCard(
+    currentWater: Double,
+    onPlusClick: () -> Unit,
+    onMinusClick: () -> Unit
+){
     Card(
         elevation = 8.dp,
         backgroundColor = colorResource(R.color.waterBlue),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .shadow(8.dp,shape = Shapes.medium)
+            .shadow(8.dp, shape = Shapes.medium)
             .clip(Shapes.medium)
     ){
         Column(
@@ -221,14 +243,18 @@ fun AddWaterConsumptionCard(currentWater: Double){
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_remove_circle_outline_24),
-                    contentDescription = "Decrease water icon",
+                IconButton(
                     modifier = Modifier
-                        .size(50.dp)
                         .padding(bottom = 8.dp)
-                        .weight(1f)
-                )
+                        .weight(1f),
+                    onClick = onMinusClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_remove_circle_outline_24),
+                        contentDescription = "Decrease water icon",
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+
 
                 Text(text = currentWater.toString() +"L",
                     textAlign = TextAlign.Center,
@@ -236,14 +262,18 @@ fun AddWaterConsumptionCard(currentWater: Double){
                     modifier = Modifier.weight(1f)
                 )
 
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_add_circle_24),
-                    contentDescription = "Add water icon",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .padding(bottom = 8.dp)
-                        .weight(1f)
-                )
+                IconButton(modifier = Modifier
+                    .size(50.dp)
+                    .padding(bottom = 8.dp)
+                    .weight(1f) ,
+                    onClick = onPlusClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_add_circle_24),
+                        contentDescription = "Add water icon",
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+
             }
 
             Row(
