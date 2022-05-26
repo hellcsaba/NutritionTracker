@@ -53,6 +53,7 @@ fun FoodSearchScreen(diaryViewModel: DiaryViewModel, navController: NavControlle
                 onConfirmClicked = {
                     if(measure.isNotEmpty()) {
                         diaryViewModel.addConsumedFood(measure)
+                        diaryViewModel.calculateConsumedMacrosAndKcal()
                         measure = ""
                     }
                     openDialog = false

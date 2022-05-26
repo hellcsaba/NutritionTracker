@@ -33,7 +33,7 @@ class FirestoreDatabaseRepository {
 
     suspend fun getUser(): NetworkResult<Any> {
         try {
-            val response = db.collection("users").document(user?.uid!!).get().await().toObject(User::class.java)
+            val response = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid!!).get().await().toObject(User::class.java)
             response?.let{
                 return NetworkSuccess(it)
             }

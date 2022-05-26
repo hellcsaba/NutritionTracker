@@ -38,9 +38,12 @@ import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 @Composable
 fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
     val consumedFoodList by diaryViewModel.consumedFoodList.observeAsState()
-    //diaryViewModel.getDayFlow()
     val day by diaryViewModel.day.observeAsState()
-    val deltaWater: Double = 0.25
+    val user by diaryViewModel.user.observeAsState()
+    val consumedKcal by diaryViewModel.consumedKcal.observeAsState(0)
+    val consumedMacros by diaryViewModel.consumedMacros.observeAsState(MacroNutrition())
+    val deltaWater = 0.25
+
     Scaffold(
         topBar ={TopAppBar(
             title = {
@@ -56,11 +59,15 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
         ) {
             day?.let { day ->
                 item{
-                    MacroDetailCard(
-                        macroTotal = day.macroTotal,
-                        kcalLimit = day.kcalLimit,
-                        consumed = 1500
-                    )
+                    user?.let {
+                        MacroDetailCard(
+                            macroTotal = user?.macroTotal!!,
+                            kcalLimit = user?.kcalLimit!!,
+                            consumed = consumedKcal,
+                            macroCurrent = consumedMacros
+                        )
+                    }
+
                     AddFoodConsumptionCard(
                         onClick = {
                             navController.navigate(route = "food_search_screen")
@@ -68,20 +75,22 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
                     )
                     AddWaterConsumptionCard(
                         currentWater = day.water!!,
-                    onMinusClick = {
-                        var new = day.water!! - deltaWater
-                        if(new < 0.0) new = 0.0
-                        diaryViewModel.updateWaterConsumption(new)
-                    },
-                    onPlusClick = {
-                        val new = day.water!! + deltaWater
-                        diaryViewModel.updateWaterConsumption(new)
-                    })
+                        onMinusClick = {
+                            var new = day.water!! - deltaWater
+                            if(new < 0.0) new = 0.0
+                            diaryViewModel.updateWaterConsumption(new)
+                        },
+                        onPlusClick = {
+                            val new = day.water!! + deltaWater
+                            diaryViewModel.updateWaterConsumption(new)
+                        }
+                    )
                 }
             }
 
 
             consumedFoodList?.let { foodList ->
+                diaryViewModel.calculateConsumedMacrosAndKcal()
                 setConsumedFoodsList(foodList = foodList, diaryViewModel = diaryViewModel)
             }
         }

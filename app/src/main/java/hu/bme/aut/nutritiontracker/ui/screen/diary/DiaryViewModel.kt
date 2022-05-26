@@ -9,10 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.bme.aut.nutritiontracker.data.ConsumedFood
-import hu.bme.aut.nutritiontracker.data.Day
-import hu.bme.aut.nutritiontracker.data.Food
-import hu.bme.aut.nutritiontracker.data.FoodResult
+import hu.bme.aut.nutritiontracker.data.*
 import hu.bme.aut.nutritiontracker.model.DiaryRepository
 import hu.bme.aut.nutritiontracker.model.FirestoreDatabaseRepository
 import hu.bme.aut.nutritiontracker.ui.screen.searchwidget.SearchWidgetState
@@ -33,6 +30,12 @@ class DiaryViewModel : ViewModel() {
     val selectedDay: LiveData<List<Day>> = _selectedDay
     private val _day = MutableLiveData<Day>()
     val day: LiveData<Day> = _day
+    private val _user = MutableLiveData<User>()
+    val user: LiveData<User> = _user
+    private val _consumedKcal = MutableLiveData<Int>()
+    val consumedKcal: LiveData<Int> = _consumedKcal
+    private val _consumedMacros = MutableLiveData<MacroNutrition>()
+    val consumedMacros: LiveData<MacroNutrition> = _consumedMacros
 
     private val _searchWidgetState: MutableState<SearchWidgetState> =
         mutableStateOf(value = SearchWidgetState.CLOSED)
@@ -43,6 +46,13 @@ class DiaryViewModel : ViewModel() {
     val searchTextState: State<String> = _searchTextState
 
     init {
+        viewModelScope.launch(Dispatchers.IO) {
+            when(val response = firestoreRepository.getUser()){
+                is NetworkSuccess -> {_user.postValue(response.value as User)
+                    Log.d("UserDiary", response.value.toString())}
+                is NetworkError -> Log.d("UserDiary" + TAG, response.errorMessage.toString())
+            }
+        }
         viewModelScope.launch(Dispatchers.IO) {
             when (val response = firestoreRepository.getDay()) {
                 is NetworkSuccess -> {
@@ -105,6 +115,31 @@ class DiaryViewModel : ViewModel() {
 
     fun updateWaterConsumption(water: Double){
         firestoreRepository.updateWaterItem(day = day.value!!, water)
+    }
+
+    fun getUser(){
+        viewModelScope.launch(Dispatchers.IO) {
+            when(val response = firestoreRepository.getUser()){
+                is NetworkSuccess -> {_user.postValue(response.value as User)
+                    Log.d(TAG, "User" + response.value.toString())}
+                is NetworkError -> Log.d(TAG, response.errorMessage.toString())
+            }
+        }
+    }
+
+    fun calculateConsumedMacrosAndKcal(){
+        var kcal = 0
+        var protein = 0
+        var carb = 0
+        var fat = 0
+        consumedFoodList.value?.forEach {
+            kcal += it.kcal!!
+            protein += it.protein!!
+            carb += it.carb!!
+            fat += it.fat!!
+        }
+        _consumedKcal.value = kcal
+        _consumedMacros.value = MacroNutrition(protein = protein, carb = carb, fat = fat)
     }
 
     companion object{
