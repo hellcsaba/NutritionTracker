@@ -1,15 +1,11 @@
 package hu.bme.aut.nutritiontracker.ui.screen.recipe
 
-import android.util.Log
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.*
-import hu.bme.aut.nutritiontracker.data.Recipe
 import hu.bme.aut.nutritiontracker.data.RecipeDetailResult
 import hu.bme.aut.nutritiontracker.data.RecipeListResult
-import hu.bme.aut.nutritiontracker.datasource.RecipeNetworkDataSource
 import hu.bme.aut.nutritiontracker.model.RecipeRepository
+import hu.bme.aut.nutritiontracker.ui.screen.searchwidget.SearchWidgetState
 
 class RecipeViewModel: ViewModel() {
     private var recipeRepository = RecipeRepository()

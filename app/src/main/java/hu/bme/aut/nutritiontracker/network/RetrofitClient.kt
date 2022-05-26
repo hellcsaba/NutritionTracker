@@ -4,17 +4,33 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 object RetrofitClient {
-    const val MainServer = "https://api.spoonacular.com"
+    const val SpoonacularServer = "https://api.spoonacular.com"
+    const val EdamamServer = "https://api.edamam.com"
+    lateinit var retrofit: Retrofit.Builder
 
-    val retrofitClient: Retrofit.Builder by lazy{
-        Retrofit.Builder()
-            .baseUrl(MainServer)
-            .addConverterFactory(MoshiConverterFactory.create())
+    fun setEdamamRetrofitClient(){
+        retrofit =
+            Retrofit.Builder()
+                .baseUrl(EdamamServer)
+                .addConverterFactory(MoshiConverterFactory.create())
     }
 
-    val apiInterface: RecipeAPI by lazy {
-        retrofitClient
+    fun setSpoonacularRetrofitClient(){
+        retrofit =
+            Retrofit.Builder()
+                .baseUrl(SpoonacularServer)
+                .addConverterFactory(MoshiConverterFactory.create())
+    }
+
+    val recipeApiInterface: RecipeAPI by lazy {
+        retrofit
             .build()
             .create(RecipeAPI::class.java)
+    }
+
+    val foodApiInterface: FoodAPI by lazy {
+        retrofit
+            .build()
+            .create(FoodAPI::class.java)
     }
 }

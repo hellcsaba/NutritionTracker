@@ -3,6 +3,7 @@ package hu.bme.aut.nutritiontracker.model
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
@@ -32,7 +33,7 @@ class FirestoreDatabaseRepository {
 
     suspend fun getUser(): NetworkResult<Any> {
         try {
-            val response = db.collection("users").document(user?.uid!!).get().await().toObject(User::class.java)
+            val response = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid!!).get().await().toObject(User::class.java)
             response?.let{
                 return NetworkSuccess(it)
             }
@@ -103,7 +104,7 @@ class FirestoreDatabaseRepository {
     }
 
     @ExperimentalCoroutinesApi
-    fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
+    suspend fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
         return db
             .collection("users")
             .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("measurements")
@@ -120,11 +121,61 @@ class FirestoreDatabaseRepository {
         measurement.id = documentSnapshot.id
         return measurement
     }
+
+    fun addConsumedFood(day: Day, consumedFood: ConsumedFood){
+        db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("consumedFoods").add(consumedFood)
+            .addOnSuccessListener{
+                db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!)
+                    .collection("days").document(day.id!!)
+                    .collection("consumedFoods").document(it.id).update("id", it.id)
+                Log.d(TAG, "Consumed food added")
+            }
+    }
+
+    @ExperimentalCoroutinesApi
+    suspend fun getConsumedFoodFlow(day: Day): Flow<List<ConsumedFood>> {
+        return db
+            .collection("users")
+            .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("consumedFoods")
+            .getDataFlow { querySnapshot ->
+                querySnapshot?.documents?.map {
+                    getConsumedFoodItemFromSnapshot(it)
+                } ?: listOf()
+            }
+    }
+
+    private fun getConsumedFoodItemFromSnapshot(documentSnapshot: DocumentSnapshot) : ConsumedFood {
+        val consumedFood = documentSnapshot.toObject(ConsumedFood::class.java)!!
+        consumedFood.id = documentSnapshot.id
+        return consumedFood
+    }
+
+    @ExperimentalCoroutinesApi
+    suspend fun getDayFlow(day: Day): Flow<Day> {
+        return db
+            .collection("users")
+            .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!)
+            .getDocumentSnapshotFlow().map { DocumentSnapshot ->
+                        getDayFromSnapshot(DocumentSnapshot!!)
+            }
+    }
+
+    private fun getDayFromSnapshot(documentSnapshot: DocumentSnapshot) : Day {
+        val day = documentSnapshot.toObject(Day::class.java)!!
+        Log.d("getDayFromSnapshot", documentSnapshot.id)
+        day.id = documentSnapshot.id
+        return day
+    }
+
+    fun updateWaterItem(day: Day, water: Double){
+        db.collection("users").document(user?.uid!!).collection("days").document(day.id!!).update("water", water)
+    }
+
 }
 
 
 @ExperimentalCoroutinesApi
-fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
+suspend fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
     return callbackFlow {
         val listenerRegistration =
             addSnapshotListener { querySnapshot, firebaseFirestoreException ->
@@ -146,9 +197,30 @@ fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
 
 
 @ExperimentalCoroutinesApi
-fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
+suspend fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
     return getQuerySnapshotFlow()
         .map {
             return@map mapper(it)
         }
+}
+
+@ExperimentalCoroutinesApi
+suspend fun DocumentReference.getDocumentSnapshotFlow(): Flow<DocumentSnapshot?> {
+    return callbackFlow {
+        val listenerRegistration =
+            addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                if (firebaseFirestoreException != null) {
+                    cancel(
+                        message = "error fetching collection data at path - $path",
+                        cause = firebaseFirestoreException
+                    )
+                    return@addSnapshotListener
+                }
+                trySend(querySnapshot).isSuccess
+            }
+        awaitClose {
+            Log.d(TAG,"cancelling the listener on collection at path - $path")
+            listenerRegistration.remove()
+        }
+    }
 }

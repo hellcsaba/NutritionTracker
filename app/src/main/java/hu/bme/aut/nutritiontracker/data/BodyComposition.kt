@@ -7,5 +7,5 @@ data class BodyComposition(
     var gender: String = "",
     var weight: Int = 0,
     var height: Int = 0,
-    var birthday: Timestamp = Timestamp(Calendar.getInstance().time.time)
+    var birthday: Date = Date()
 )

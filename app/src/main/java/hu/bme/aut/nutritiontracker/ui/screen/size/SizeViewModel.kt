@@ -42,7 +42,6 @@ class SizeViewModel:ViewModel() {
                 firestoreRepository.getMeasurementsFlow(it[0]).collect{ list ->
                     _allMeasurements.postValue(list)
                 }
-
             }
         }
     }

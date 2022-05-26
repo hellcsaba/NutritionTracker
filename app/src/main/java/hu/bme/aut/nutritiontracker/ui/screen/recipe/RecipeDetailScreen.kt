@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.AsyncImagePainter
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import hu.bme.aut.nutritiontracker.R
@@ -66,7 +67,7 @@ fun Content(recipe: RecipeDetailResult){
                 .clip(Shapes.medium),
             contentScale = ContentScale.Crop,
         )
-        if(painter.state is ImagePainter.State.Loading){
+        if(painter.state is AsyncImagePainter.State.Loading){
             CircularProgressIndicator()
         }
 
