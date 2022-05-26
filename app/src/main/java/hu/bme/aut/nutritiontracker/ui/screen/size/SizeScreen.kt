@@ -54,7 +54,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
         if(openDialog){
             AddMeasurementDialog(
                 onConfirmClicked = {
-                    showToast(context = context, "onConfirmClicked")
+                    //showToast(context = context, "onConfirmClicked")
                     sizeViewModel.addMeasurement(name, 0.0, 0.0)
                     name = ""
                     openDialog = false

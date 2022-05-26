@@ -1,6 +1,7 @@
 package hu.bme.aut.nutritiontracker
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +16,7 @@ import hu.bme.aut.nutritiontracker.ui.screen.*
 import hu.bme.aut.nutritiontracker.ui.screen.authentication.AuthenticationViewModel
 
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun SetupNavGraph() {

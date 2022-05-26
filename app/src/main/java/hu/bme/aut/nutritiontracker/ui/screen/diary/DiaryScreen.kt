@@ -38,11 +38,15 @@ import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 @Composable
 fun DiaryScreen(diaryViewModel: DiaryViewModel, navController: NavController) {
     val consumedFoodList by diaryViewModel.consumedFoodList.observeAsState()
+    //val selectedDay by diaryViewModel.selectedDay.observeAsState()
     val day by diaryViewModel.day.observeAsState()
     val user by diaryViewModel.user.observeAsState()
     val consumedKcal by diaryViewModel.consumedKcal.observeAsState(0)
     val consumedMacros by diaryViewModel.consumedMacros.observeAsState(MacroNutrition())
     val deltaWater = 0.25
+
+    diaryViewModel.getDayFlow()
+    diaryViewModel.getConsumedFoodFlow()
 
     Scaffold(
         topBar ={TopAppBar(

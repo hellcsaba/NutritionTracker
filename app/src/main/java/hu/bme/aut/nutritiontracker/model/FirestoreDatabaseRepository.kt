@@ -64,7 +64,8 @@ class FirestoreDatabaseRepository {
         }
     }
 
-    suspend fun addDay(date: Date = Date(), day: Day = Day()){
+    suspend fun addDay(date: Date = Date(), day: Day = Day()):Boolean{
+        var success = false
         val start = Date(date.time)
         val end = Date(date.time)
         start.hours = 0
@@ -87,9 +88,12 @@ class FirestoreDatabaseRepository {
                 .addOnSuccessListener {
                     //set the id of the day
                     db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(it.id).update("id", it.id)
+                    success = true
                     Log.d(TAG, "Day was added successfully!")
                 }
                 .addOnFailureListener { e -> Log.w(TAG, "Error adding day document", e) }
+        success = true
+        return success
     }
 
     fun addMeasurement(day: Day, measurement: Measurement){
@@ -103,8 +107,17 @@ class FirestoreDatabaseRepository {
         db.collection("users").document(user?.uid!!).collection("days").document(day.id!!).collection("measurements").document(measurement.id!!).set(measurement)
     }
 
+    fun updateMacroTotal(macro: MacroNutrition){
+        db.collection("users").document(user?.uid!!).update("macroTotal", macro)
+    }
+
+    fun updateBodyCompositionAndKcalLimit(kcalLimit: Int, body: BodyComposition){
+        db.collection("users").document(user?.uid!!).update("bodyComposition", body)
+        db.collection("users").document(user?.uid!!).update("kcalLimit", kcalLimit)
+    }
+
     @ExperimentalCoroutinesApi
-    suspend fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
+    fun getMeasurementsFlow(day: Day): Flow<List<Measurement>> {
         return db
             .collection("users")
             .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("measurements")
@@ -133,7 +146,7 @@ class FirestoreDatabaseRepository {
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun getConsumedFoodFlow(day: Day): Flow<List<ConsumedFood>> {
+    fun getConsumedFoodFlow(day: Day): Flow<List<ConsumedFood>> {
         return db
             .collection("users")
             .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("consumedFoods")
@@ -151,7 +164,7 @@ class FirestoreDatabaseRepository {
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun getDayFlow(day: Day): Flow<Day> {
+    fun getDayFlow(day: Day): Flow<Day> {
         return db
             .collection("users")
             .document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!)
@@ -175,7 +188,7 @@ class FirestoreDatabaseRepository {
 
 
 @ExperimentalCoroutinesApi
-suspend fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
+fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
     return callbackFlow {
         val listenerRegistration =
             addSnapshotListener { querySnapshot, firebaseFirestoreException ->
@@ -197,7 +210,7 @@ suspend fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
 
 
 @ExperimentalCoroutinesApi
-suspend fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
+fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
     return getQuerySnapshotFlow()
         .map {
             return@map mapper(it)
@@ -205,7 +218,7 @@ suspend fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): 
 }
 
 @ExperimentalCoroutinesApi
-suspend fun DocumentReference.getDocumentSnapshotFlow(): Flow<DocumentSnapshot?> {
+fun DocumentReference.getDocumentSnapshotFlow(): Flow<DocumentSnapshot?> {
     return callbackFlow {
         val listenerRegistration =
             addSnapshotListener { querySnapshot, firebaseFirestoreException ->

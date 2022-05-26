@@ -117,12 +117,12 @@ fun KeyValueRow(property: String, value: String){
         Text(
             text = property,
             style = MaterialTheme.typography.body2,
-            fontSize = 18.sp
+            fontSize = 18.sp,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.body2,
-            fontSize = 18.sp
+            fontSize = 18.sp,
         )
     }
 }

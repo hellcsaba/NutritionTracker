@@ -1,6 +1,7 @@
 package hu.bme.aut.nutritiontracker.ui.navigation
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -17,11 +18,13 @@ import hu.bme.aut.nutritiontracker.Screen
 import hu.bme.aut.nutritiontracker.ui.screen.*
 import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.diary.FoodSearchScreen
+import hu.bme.aut.nutritiontracker.ui.screen.profile.ProfileViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeDetailScreen
 import hu.bme.aut.nutritiontracker.ui.screen.recipe.RecipeViewModel
 import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
@@ -32,10 +35,11 @@ fun BottomNavGraph(navController: NavHostController) {
         startDestination = BottomBarScreen.Diary.route
     ) {
         composable(route = BottomBarScreen.Diary.route) {
+            diaryViewModel.attach(LocalContext.current as LifecycleOwner)
             DiaryScreen(diaryViewModel = diaryViewModel, navController = navController)
         }
         composable(route = BottomBarScreen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(profileViewModel = ProfileViewModel())
         }
         composable(route = BottomBarScreen.Size.route) {
             SizeScreen(sizeViewModel = SizeViewModel())

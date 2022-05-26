@@ -1,5 +1,6 @@
 package hu.bme.aut.nutritiontracker.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomBarScreen
 import hu.bme.aut.nutritiontracker.ui.navigation.BottomNavGraph
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen(navController: NavHostController) {

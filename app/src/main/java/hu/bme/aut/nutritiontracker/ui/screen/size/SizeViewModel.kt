@@ -38,10 +38,17 @@ class SizeViewModel:ViewModel() {
                 is NetworkError -> Log.d("SizeViewModelDay", response.errorMessage.toString())
             }
 
-            selectedDay.value?.let {
-                firestoreRepository.getMeasurementsFlow(it[0]).collect{ list ->
-                    _allMeasurements.postValue(list)
+        }
+
+        selectedDay.value?.let {
+            if(it.isNotEmpty()) {
+                val res = firestoreRepository.getMeasurementsFlow(it[0])
+                viewModelScope.launch(Dispatchers.IO) {
+                    res.collect { list ->
+                        _allMeasurements.postValue(list)
+                    }
                 }
+
             }
         }
     }
