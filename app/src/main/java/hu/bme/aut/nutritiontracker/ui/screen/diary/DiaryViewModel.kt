@@ -142,6 +142,10 @@ class DiaryViewModel : ViewModel() {
         firestoreRepository.addConsumedFood(day = selectedDay.value?.get(0)!!, consumedFood = countedFood)
     }
 
+    fun deleteConsumedFood(id: String){
+        firestoreRepository.deleteConsumedFood(day = selectedDay.value?.get(0)!!,id = id)
+    }
+
     fun updateWaterConsumption(water: Double){
         firestoreRepository.updateWaterItem(day = day.value!!, water)
     }

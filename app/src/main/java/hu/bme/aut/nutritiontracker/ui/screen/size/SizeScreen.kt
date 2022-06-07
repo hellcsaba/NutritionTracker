@@ -36,6 +36,9 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     var name by remember { mutableStateOf("") }
     var measureList: MutableList<Measurement>? = sizeViewModel.allMeasurements.observeAsState().value?.toMutableList()
 
+    sizeViewModel.getDayFlow()
+    sizeViewModel.getMeasurementsFlow()
+
     Scaffold(
         topBar ={DefaultAppBar(
             onAddClicked = {

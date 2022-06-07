@@ -30,6 +30,7 @@ import hu.bme.aut.nutritiontracker.ui.screen.size.SizeViewModel
 fun BottomNavGraph(navController: NavHostController) {
     val recipeViewModel = RecipeViewModel()
     val diaryViewModel = DiaryViewModel()
+    val sizeViewModel = SizeViewModel()
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Diary.route
@@ -42,7 +43,8 @@ fun BottomNavGraph(navController: NavHostController) {
             ProfileScreen(profileViewModel = ProfileViewModel())
         }
         composable(route = BottomBarScreen.Size.route) {
-            SizeScreen(sizeViewModel = SizeViewModel())
+            sizeViewModel.attach(LocalContext.current as LifecycleOwner)
+            SizeScreen(sizeViewModel = sizeViewModel)
         }
         composable(route = BottomBarScreen.Plan.route) {
             PlanScreen()

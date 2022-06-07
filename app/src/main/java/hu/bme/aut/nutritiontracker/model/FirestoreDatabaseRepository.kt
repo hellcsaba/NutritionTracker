@@ -98,9 +98,12 @@ class FirestoreDatabaseRepository {
 
     fun addMeasurement(day: Day, measurement: Measurement){
         db.collection("users").document(user?.uid!!).collection("days").document(day.id!!).collection("measurements").add(measurement)
-            .addOnCompleteListener{
-                Log.d(TAG, "measurement added")
+            .addOnSuccessListener {
+                //set the id of the measurement
+                db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("measurements").document(it.id).update("id", it.id)
+                Log.d(TAG, "Measurement was added successfully!")
             }
+            .addOnFailureListener { e -> Log.w(TAG, "Error adding measurement document", e) }
     }
 
     fun updateMeasurement(day: Day, measurement: Measurement){
@@ -133,6 +136,11 @@ class FirestoreDatabaseRepository {
         val measurement = documentSnapshot.toObject(Measurement::class.java)!!
         measurement.id = documentSnapshot.id
         return measurement
+    }
+
+    fun deleteConsumedFood(day: Day, id: String){
+        db.collection("users").document(FirebaseAuthRepository.auth.currentUser?.uid!!).collection("days").document(day.id!!).collection("consumedFoods")
+            .document(id).delete()
     }
 
     fun addConsumedFood(day: Day, consumedFood: ConsumedFood){

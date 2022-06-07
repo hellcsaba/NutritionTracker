@@ -1,14 +1,12 @@
 package hu.bme.aut.nutritiontracker.ui.screen.size
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import hu.bme.aut.nutritiontracker.data.Day
 import hu.bme.aut.nutritiontracker.data.Measurement
 import hu.bme.aut.nutritiontracker.data.User
 import hu.bme.aut.nutritiontracker.model.FirestoreDatabaseRepository
+import hu.bme.aut.nutritiontracker.ui.screen.diary.DiaryViewModel
 import hu.bme.aut.nutritiontracker.util.NetworkError
 import hu.bme.aut.nutritiontracker.util.NetworkSuccess
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +23,14 @@ class SizeViewModel:ViewModel() {
     private val _selectedDay = MutableLiveData<List<Day>>()
     val selectedDay: LiveData<List<Day>> = _selectedDay
 
+    private val _day = MutableLiveData<Day>()
+    val day: LiveData<Day> = _day
+
+    private lateinit var owner: LifecycleOwner
+    fun attach(lifeCycleOwner: LifecycleOwner){
+        owner = lifeCycleOwner
+    }
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             when(val response = firestoreRepository.getUser()){
@@ -40,6 +46,42 @@ class SizeViewModel:ViewModel() {
 
         }
 
+
+    }
+
+    fun getDayFlow(){
+        selectedDay.observe(owner,
+            object: Observer<List<Day>> {
+                override fun onChanged(res: List<Day>) {
+                    dayFlow()
+                }
+            })
+    }
+
+    private fun dayFlow(){
+        selectedDay.value?.let {
+            if(it.isNotEmpty()) {
+                val res = firestoreRepository.getDayFlow(it[0])
+                viewModelScope.launch(Dispatchers.IO) {
+                    res.collect { day ->
+                        Log.d(DiaryViewModel.TAG, "DayFlow")
+                        _day.postValue(day)
+                    }
+                }
+            }
+        }
+    }
+
+    fun getMeasurementsFlow(){
+        day.observe(owner,
+            object: Observer<Day> {
+                override fun onChanged(res: Day) {
+                    measurementsFlow()
+                }
+            })
+    }
+
+    private fun measurementsFlow(){
         selectedDay.value?.let {
             if(it.isNotEmpty()) {
                 val res = firestoreRepository.getMeasurementsFlow(it[0])
@@ -48,7 +90,6 @@ class SizeViewModel:ViewModel() {
                         _allMeasurements.postValue(list)
                     }
                 }
-
             }
         }
     }

@@ -18,15 +18,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import hu.bme.aut.nutritiontracker.R
 import hu.bme.aut.nutritiontracker.data.ConsumedFood
 import hu.bme.aut.nutritiontracker.ui.theme.Shapes
 
 @ExperimentalMaterialApi
 @Composable
-fun ConsumedFoodItem(food: ConsumedFood) {
+fun ConsumedFoodItem(
+    food: ConsumedFood,
+    onDelete: () -> Unit
+) {
     var expandedState by remember { mutableStateOf(false) }
     val rotationState by animateFloatAsState(
         targetValue = if (expandedState) 180f else 0f
@@ -34,9 +39,9 @@ fun ConsumedFoodItem(food: ConsumedFood) {
 
     Card(
         shape = Shapes.small,
-        modifier =  Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .shadow(6.dp,shape = Shapes.small)
+            .shadow(6.dp, shape = Shapes.small)
             .clip(Shapes.small)
             .animateContentSize(
                 animationSpec = tween(
@@ -123,6 +128,22 @@ fun ConsumedFoodItem(food: ConsumedFood) {
                     property = "Fat: ",
                     value = food.fat.toString() +"g"
                 )
+
+                Row{
+                    IconButton(modifier = Modifier
+                        .size(35.dp)
+                        .padding(bottom = 8.dp)
+                        .weight(1f) ,
+                        onClick = { onDelete() }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_delete_24),
+                            contentDescription = "Delete consumed food icon",
+                            modifier = Modifier.size(35.dp)
+                        )
+                    }
+                }
+
             }
         }
     }
