@@ -36,6 +36,9 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
     var name by remember { mutableStateOf("") }
     var measureList: MutableList<Measurement>? = sizeViewModel.allMeasurements.observeAsState().value?.toMutableList()
 
+    sizeViewModel.getDayFlow()
+    sizeViewModel.getMeasurementsFlow()
+
     Scaffold(
         topBar ={DefaultAppBar(
             onAddClicked = {
@@ -54,7 +57,7 @@ fun SizeScreen(sizeViewModel: SizeViewModel) {
         if(openDialog){
             AddMeasurementDialog(
                 onConfirmClicked = {
-                    showToast(context = context, "onConfirmClicked")
+                    //showToast(context = context, "onConfirmClicked")
                     sizeViewModel.addMeasurement(name, 0.0, 0.0)
                     name = ""
                     openDialog = false

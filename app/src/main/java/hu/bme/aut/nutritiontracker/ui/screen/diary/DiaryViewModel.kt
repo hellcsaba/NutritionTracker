@@ -4,10 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.nutritiontracker.data.*
 import hu.bme.aut.nutritiontracker.model.DiaryRepository
@@ -45,6 +42,11 @@ class DiaryViewModel : ViewModel() {
         mutableStateOf(value = "")
     val searchTextState: State<String> = _searchTextState
 
+    private lateinit var owner: LifecycleOwner
+    fun attach(lifeCycleOwner: LifecycleOwner){
+        owner = lifeCycleOwner
+    }
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             when(val response = firestoreRepository.getUser()){
@@ -61,16 +63,8 @@ class DiaryViewModel : ViewModel() {
                 }
                 is NetworkError -> Log.d(TAG, response.errorMessage.toString())
             }
-
-            selectedDay.value?.let {
-                firestoreRepository.getDayFlow(it[0]).collect{ day ->
-                    Log.d(TAG, "DayFlow")
-                    _day.postValue(day)
-                    getConsumedFoodFlow()
-                }
-            }
-
         }
+
     }
 
     fun updateSearchWidgetState(newValue: SearchWidgetState) {
@@ -81,11 +75,46 @@ class DiaryViewModel : ViewModel() {
         _searchTextState.value = newValue
     }
 
+    fun getDayFlow(){
+        selectedDay.observe(owner,
+            object: Observer<List<Day>> {
+                override fun onChanged(res: List<Day>) {
+                    dayFlow()
+                }
+            })
+    }
+
+    private fun dayFlow(){
+        selectedDay.value?.let {
+            if(it.isNotEmpty()) {
+                val res = firestoreRepository.getDayFlow(it[0])
+                viewModelScope.launch(Dispatchers.IO) {
+                    res.collect { day ->
+                        Log.d(TAG, "DayFlow")
+                        _day.postValue(day)
+                    }
+                }
+            }
+        }
+    }
+
     fun getConsumedFoodFlow(){
-        viewModelScope.launch(Dispatchers.IO) {
-            firestoreRepository.getConsumedFoodFlow(day.value!!).collect{ list ->
+        day.observe(owner,
+            object: Observer<Day> {
+                override fun onChanged(res: Day) {
+                    ConsumedFoodFlow()
+                }
+            })
+    }
+
+    private fun ConsumedFoodFlow(){
+        day.value?.let{
+            val res = firestoreRepository.getConsumedFoodFlow(day.value!!)
+            viewModelScope.launch(Dispatchers.IO) {
+                res.collect{ list ->
                     _consumedFoodList.postValue(list)
                 }
+            }
         }
     }
 
@@ -111,6 +140,10 @@ class DiaryViewModel : ViewModel() {
             image = selectedFood.image
         )
         firestoreRepository.addConsumedFood(day = selectedDay.value?.get(0)!!, consumedFood = countedFood)
+    }
+
+    fun deleteConsumedFood(id: String){
+        firestoreRepository.deleteConsumedFood(day = selectedDay.value?.get(0)!!,id = id)
     }
 
     fun updateWaterConsumption(water: Double){

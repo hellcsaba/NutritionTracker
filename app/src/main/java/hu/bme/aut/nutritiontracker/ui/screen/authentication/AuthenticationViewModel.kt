@@ -12,6 +12,7 @@ import hu.bme.aut.nutritiontracker.util.NetworkError
 import hu.bme.aut.nutritiontracker.util.NetworkSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.security.auth.callback.Callback
 
 class AuthenticationViewModel: ViewModel(){
@@ -48,14 +49,19 @@ class AuthenticationViewModel: ViewModel(){
     fun signIn(email: String, password: String, onChanged: () -> Unit){
         FirebaseAuthRepository.signIn(email = email, password = password).observe(owner,
             object: Observer<Boolean> {
-                override fun onChanged(res: Boolean?) {
-                    _loggedIn.value = res
-                    onChanged()
-                    //if(_selectedDay.value.isNullOrEmpty())
-                    if(res!!)
+                override fun onChanged(res: Boolean) {
+                    if(res)
                         viewModelScope.launch(Dispatchers.IO) {
                             firestoreDatabaseRepository.addDay()
+                            _loggedIn.postValue(firestoreDatabaseRepository.addDay())
                         }
+                    else{
+                        _loggedIn.value = false
+                    }
+                    Log.d("SignIN", "onChangedCall")
+                    onChanged()
+                    //if(_selectedDay.value.isNullOrEmpty())
+
                 }
 
             }

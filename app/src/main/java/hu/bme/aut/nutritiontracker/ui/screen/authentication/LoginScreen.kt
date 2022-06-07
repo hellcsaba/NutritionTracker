@@ -144,9 +144,9 @@ fun LoginScreen(authenticationViewModel: AuthenticationViewModel, navController:
                                     launchSingleTop = true
                                 }
                             }
-                            else {
-                                showToast(context, "Authentication failed.")
-                            }
+//                            else {
+//                                showToast(context, "Authentication failed.")
+//                            }
                         }
                     }
                 )
